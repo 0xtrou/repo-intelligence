@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "target": "bagaofficial.com",
-  "createdAt": "2026-09-19T04:37:44.296Z",
-  "status": "confirmed",
-  "basedOnProfile": "/tmp/ri-profile.json",
+  "createdAt": "2026-09-19T06:06:06.915Z",
+  "status": "draft",
+  "basedOnProfile": "/tmp/ri-profile-baga.json",
   "tooling": [
     {
       "concern": "e2e",
@@ -45,6 +45,12 @@
       "concern": "workflow-telemetry",
       "tool": "repo-intelligence (measure/insight)",
       "rationale": "gate pass-rates, gate runtimes and rework loops are workflow metrics; record them via this toolkit",
+      "present": false
+    },
+    {
+      "concern": "external-monitoring",
+      "tool": "generic: gh api / npm registry / target monitors / manual probes",
+      "rationale": "the target has a declared world-facing surface; external.* and perception.* metrics are collected from sources that exist and recorded via measure",
       "present": false
     }
   ],
@@ -135,24 +141,76 @@
       "instrumentMissing": false
     },
     {
-      "id": "visual.matchScore",
-      "layer": "C",
+      "id": "external.api.errorRate",
+      "layer": "E",
       "unit": "ratio",
-      "description": "visual-regression match (Maestro assertScreenshot)",
-      "source": "maestro test flows (.maestro/flows/*.yaml)",
+      "description": "error rate of the API the repo exposes",
+      "source": "target monitors / probe scripts / manual",
+      "threshold": {
+        "kind": "max",
+        "value": 0.01
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "external.api.latencyMs",
+      "layer": "E",
+      "unit": "ms",
+      "description": "latency of the exposed API surface",
+      "source": "target monitors / probes",
+      "threshold": {
+        "kind": "max",
+        "value": 800
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "perception.github.stars",
+      "layer": "E",
+      "unit": "count",
+      "description": "GitHub stars",
+      "source": "gh api repos/<owner>/<repo>",
+      "instrumentMissing": true
+    },
+    {
+      "id": "perception.github.openIssues",
+      "layer": "E",
+      "unit": "count",
+      "description": "open issues",
+      "source": "gh api repos/<owner>/<repo>",
+      "instrumentMissing": true
+    },
+    {
+      "id": "perception.dep.deprecatedCount",
+      "layer": "E",
+      "unit": "count",
+      "description": "declared deps deprecated upstream",
+      "source": "npm registry check of deps",
+      "threshold": {
+        "kind": "max",
+        "value": 0
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "business.revenue.monthlyUsd",
+      "layer": "S",
+      "unit": "usd/month",
+      "description": "revenue of the business the repo serves",
+      "source": "business analytics / user interview",
+      "instrumentMissing": true
+    },
+    {
+      "id": "philosophy.inclusion.score",
+      "layer": "S",
+      "unit": "ratio",
+      "description": "how fully the product serves all humans; a11y.violations is the code proxy",
+      "source": "manual audit / a11y records",
       "threshold": {
         "kind": "min",
         "value": 0.95
       },
-      "instrumentMissing": false
-    },
-    {
-      "id": "build.sizeBytes",
-      "layer": "C",
-      "unit": "bytes",
-      "description": "build artifact size (dist/)",
-      "source": "du on dist/ after npm run build",
-      "instrumentMissing": false
+      "instrumentMissing": true
     }
   ]
 }

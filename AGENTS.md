@@ -41,6 +41,7 @@ docs/assets/     README diagram
 
 ## Hard rules for agents working in this repo
 
+0. **Conviction first (mandate).** Before running any command of this toolkit, read and internalize `PHILOSOPHY.md`, form the conviction contract for the request (restated request · target & scale · expected outcome · must-NOT-happen · open questions), and get the user's explicit confirmation. No command — not even read-only `profile` — runs before that confirmation. "I assumed" is a violation.
 1. **Append-only `runs/`:** never edit, reorder, or delete lines in any `runs/*.jsonl`.
 2. **Canonical single source:** metric ids/units → `METRICS.md`; thresholds → plan files; numbers → runs. Never duplicate a definition; docs and code must not drift.
 3. **Additive-only schema evolution:** never rename or repurpose a metric id or schema field (deprecate + add).

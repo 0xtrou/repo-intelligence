@@ -9,6 +9,19 @@ description: Architect and benchmark intelligence for any repo/harness — profi
 Canonical docs, do not duplicate: [PHILOSOPHY.md](../../PHILOSOPHY.md) (constitution) ·
 [METRICS.md](../../METRICS.md) (metric vocabulary) · [schema/](../../schema/) (record/plan contracts).
 
+## Rule 0 — conviction first (MANDATE, before anything else)
+
+Using this toolkit at all means: **read and internalize the philosophy first, then confirm the conviction with the user — no command runs before that confirmation.**
+
+1. **Read to internalize.** Read `PHILOSOPHY.md` and this skill until you can restate the model in your own words: 4 layers, 3 zones (Inside–Outside), the fractal ladder, the self-balancing loop. If you cannot restate it, you are not ready to run anything.
+2. **Write the conviction contract for THIS request** and show it to the user:
+   - *Restated request* — one sentence: what the user actually asked for
+   - *Target & scale* — which target id, which rungs of the ladder are in play
+   - *Expected outcome* — the artifact/answer the user will receive (profile? plan? baseline round? wisdom comparison? rebalance?)
+   - *Must NOT happen* — no target-repo code written (boundary rule), no unrequested recursion, no plan confirmed without sign-off
+   - *Open questions* — asked, not assumed
+3. **Wait for the user's confirmation.** "I assumed" is a violation of this rule. Jumping straight to `profile` without a confirmed contract is a violation even though the command is read-only — the mandate is about alignment, not about safety.
+
 ## The boundary (hard rule — read before anything else)
 
 This toolkit **prescribes and measures — it never implements the target repo's own test/tooling code**.
@@ -31,7 +44,7 @@ Record-file shapes accepted by `measure`: `{"metrics": {"runtime.lcpMs": 1200}}`
 Metric ids must exist in METRICS.md and use dot notation with camelCase segments (`workflow.gate.passRate`).
 Values must be finite numbers or booleans — invalid records are rejected and **nothing is appended**.
 
-## The four-phase loop (run in order — skipping a phase makes the next one guesswork)
+## The four-phase loop (Rule 0 first; then run in order — skipping a phase makes the next one guesswork)
 
 **Phase 1 — Understand.** `npm run profile -- <target-repo-path> --out /tmp/ri-profile.json`, then read
 the JSON together with the target's own docs (AGENTS.md, CI, gates). Read-only on the target. The

@@ -61,6 +61,8 @@ The Inside–Outside model applies at every scale, and the scales stack. A repo 
 
 ## Principles
 
+**0. Conviction before commands.** Using this toolkit means the agent first reads and internalizes this philosophy, forms a conviction contract for the request (restated request · target & scale · expected outcome · must-NOT-happen · open questions), and gets the user's explicit confirmation — no command runs before that confirmation, not even read-only ones. The measurement machinery amplifies alignment as much as misalignment: an unconfirmed conviction produces confidently wrong artifacts.
+
 **1. Context is the constraint.** An agent (or a new teammate) is only as good as the context it can see, and every repo boundary loses context. Understanding must be an *artifact* (`RepoProfile`), not tribal knowledge in someone's head — any session that starts from the artifact starts from the same truth.
 
 **2. Evidence or it didn't happen.** Every measurement cites its tool and `capturedAt`; every insight cites its records. A claim without a record row is gossip, and gossip does not enter this repo.
