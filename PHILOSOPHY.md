@@ -12,7 +12,7 @@ A business must first understand its business model, then choose directions and 
 
 | # | Layer | Business analogy | Question it answers | Artifact | Command |
 |---|---|---|---|---|---|
-| 1 | **Understand** | business model canvas | "What is this repo?" | `RepoProfile` | `npm run profile -- <target>` |
+| 1 | **Understand** | business model canvas | "What is this repo — inside, boundary, outside?" | `RepoProfile` | `npm run profile -- <target>` |
 | 2 | **Define good** | strategy & KPIs | "What does good mean here — which tools, which metrics, which thresholds?" | `MeasurementPlan` | `npm run plan -- <profile.json>` |
 | 3 | **Measure** | business metrics | "Where are we today?" | `RunRecord`s (append-only time series) | `npm run measure -- <target> <record.json>` |
 | 4 | **Intelligence** | BI & decisions | "What do we do next? Which wisdom wins?" | insight report | `npm run insight -- <target>` |
@@ -20,6 +20,24 @@ A business must first understand its business model, then choose directions and 
 The layers are strictly ordered. A profile you skipped makes every threshold a guess; a plan you skipped makes every number uninterpretable; measurements without intelligence are dead weight; intelligence without history is opinion.
 
 **Layer 2 is where the architect lives.** The `plan` step turns a profile into a *prescription*: which tools the harness needs (e2e runner, visual regression, a11y, performance — with rationale), and which metrics A, B, C it must track, each with a unit, a threshold, and a collection source. A plan is always a **draft until the user confirms it** — the architect advises, the human decides.
+
+---
+
+## The Inside–Outside model
+
+A business measures its internal operations *and* its market: what it sells, what it depends on, and how the market sees it. Repos are the same. Every target has **two worlds and three measurement zones**:
+
+| Zone | Question it forces | Covers | How numbers arrive |
+|---|---|---|---|
+| **INSIDE** (ops) | "What is it, internally?" | stack, LOC, routes, tests, gates, CI | `profile` scans (generic inventory) |
+| **BOUNDARY** (exchange) | "What crosses the line?" | *exposes*: endpoints, contracts, packages · *consumes*: services, deps, env | the target **declares** → architect prescribes `external.*` → `measure` ingests |
+| **OUTSIDE** (perception) | "How does the world see it?" | GitHub, npm, dependency health, docs surface | the world **reports** (`gh api`, registries) → `measure` ingests `perception.*` |
+
+**The one-line rule:** *profile scans INSIDE only; BOUNDARY and OUTSIDE numbers arrive through `measure` from sources that exist. The meta names the zones; the meta does not go exploring.*
+
+**Why this model exists (the miss it prevents):** the first cut of this toolkit measured only INSIDE, and nobody noticed — because the vocabulary *is* the agent's checklist, and a checklist without an "outside" section guarantees the outside gets skipped. Agents do not miss things at random; they miss exactly what the taxonomy never asks them to name. Naming all three zones is the miss-prevention mechanism.
+
+**What stays meta:** the toolkit defines the outward *vocabulary* (`external.*`, `perception.*`), prescribes those metrics when applicable, and ingests their numbers like any other metric. It never parses the target's frameworks to discover its endpoints, and never bakes target-specific extraction into its code — declaring the boundary surface is the target's own job.
 
 ---
 

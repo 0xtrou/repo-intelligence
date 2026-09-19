@@ -18,9 +18,13 @@ Every `RunRecord` (see `schema/run-record.schema.json`) carries:
 | `metrics` | yes | map of metric id → number or boolean |
 | `notes` | no | free text |
 
-## Layer A — RepoProfile (static inventory)
+## Layer A — RepoProfile (static inventory: inside + declared boundary)
 
-Not measured over time; re-profiled when the target changes. See `src/profile.ts` output and `RepoProfile` in `src/lib/types.ts`: stack, LOC by extension, routes, test files, deps, workflow docs (AGENTS.md/CLAUDE.md), CI workflows, gate-like scripts.
+Not measured over time; re-profiled when the target changes. See `RepoProfile` in `src/lib/types.ts` and the [Inside–Outside model](PHILOSOPHY.md) in PHILOSOPHY.md.
+
+- **INSIDE:** stack, LOC by extension, routes, test files, workflow docs (AGENTS.md/CLAUDE.md), CI workflows, gate-like scripts.
+- **BOUNDARY (declared only):** `outward.declares` (bin, private, workspaces, publishConfig), `outward.contractFiles` (contract-named files at root), `outward.gitRemote`. The profile records what the target *declares in manifests* — it never parses frameworks to discover endpoints.
+- Dependency lists (`deps`) are the declared consumption of the package world; they belong to this inventory too.
 
 ## Layer B — Workflow metrics (agentic performance)
 
@@ -49,9 +53,33 @@ Not measured over time; re-profiled when the target changes. See `src/profile.ts
 
 Note: most harnesses today measure correctness (functional/a11y/visual) well and performance not at all. Layer C is the dimension `plan` is instructed to always check for — absence of a perf instrument is itself a finding.
 
+## Layer E — Outward metrics (`external.*` + `perception.*`)
+
+The outside dimension ([Inside–Outside model](PHILOSOPHY.md)). Numbers arrive through `measure` from sources that exist; the meta never extracts them from the target's frameworks. `instrumentMissing` is the normal state at first — the prescription tells the target what instrument to adopt (its own work, never ours).
+
+### `external.*` — repo → world (exchange health)
+
+| Metric id | Unit | Description | Suggested threshold | Typical source |
+|---|---|---|---|---|
+| `external.api.errorRate` | ratio 0–1 | error rate of the API the repo exposes | ≤ 0.01 | target monitors / probe scripts / manual |
+| `external.api.latencyMs` | ms | latency of the exposed API surface | ≤ 800 | target monitors / probes |
+| `external.contract.drift` | count | consumer-visible contract mismatches detected | = 0 | contract tests of the target |
+| `external.integration.health` | ratio 0–1 | health of consumed external services | ≥ 0.99 | target monitors / provider status |
+
+### `perception.*` — world → repo (market view)
+
+| Metric id | Unit | Description | Suggested threshold | Typical source |
+|---|---|---|---|---|
+| `perception.github.stars` | count | GitHub stars | informational | `gh api` |
+| `perception.github.openIssues` | count | open issues | informational | `gh api` |
+| `perception.github.ci.conclusion` | boolean | last CI run green? | true | `gh api` |
+| `perception.npm.downloadsWeekly` | count | weekly downloads (published packages) | informational | npm registry |
+| `perception.dep.deprecatedCount` | count | declared deps deprecated upstream | = 0 | npm registry check of deps |
+| `perception.docs.surface` | count | public docs artifacts present (README/LICENSE/changelog/contributing) | ≥ 3 | manifest check |
+
 ## Layer D — Derived (computed, never measured directly)
 
-Produced by `insight` from B+C records: per-metric stats (first/latest/min/max), delta vs baseline, trends, threshold pass rates, per-`wisdom` comparison. Layer D values are never stored as records — recomputing them from history is the point.
+Produced by `insight` from B+C+E records: per-metric stats (first/latest/min/max), delta vs baseline, trends, threshold pass rates, per-`wisdom` comparison. Layer D values are never stored as records — recomputing them from history is the point.
 
 ## Extension rules
 
