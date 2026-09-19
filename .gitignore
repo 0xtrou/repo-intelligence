@@ -1,0 +1,5 @@
+node_modules/
+*.log
+.DS_Store
+# runs/ and plans/ are committed on purpose:
+# append-only measurement history and confirmed plans are the point of this repo.

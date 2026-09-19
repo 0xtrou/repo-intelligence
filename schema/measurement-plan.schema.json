@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "repo-intelligence/measurement-plan.schema.json",
+  "title": "MeasurementPlan",
+  "description": "The architect artifact: tooling prescriptions + metric definitions for one target. Drafts must be confirmed by the user before records are judged against them.",
+  "type": "object",
+  "required": ["schemaVersion", "target", "createdAt", "status", "tooling", "metrics"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "confirmed"],
+      "description": "draft = machine-generated proposal; confirmed = user signed off (npm run plan -- --confirm)."
+    },
+    "basedOnProfile": {
+      "type": "string",
+      "description": "Path or id of the RepoProfile this plan was drafted from."
+    },
+    "tooling": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["concern", "tool", "rationale", "present"],
+        "additionalProperties": false,
+        "properties": {
+          "concern": {
+            "type": "string",
+            "enum": ["unit", "e2e", "visual-regression", "cross-device", "accessibility", "performance", "workflow-telemetry"]
+          },
+          "tool": { "type": "string", "minLength": 1 },
+          "rationale": { "type": "string", "minLength": 1 },
+          "present": {
+            "type": "boolean",
+            "description": "true = already installed/used in the target; false = prescription (the target must adopt it — adopting is the target's own work, never this toolkit's)."
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "layer", "unit", "description", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)+$",
+            "description": "Dot notation with camelCase segments; must exist in METRICS.md (canonical vocabulary)."
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["A", "B", "C", "D"],
+            "description": "B=workflow, C=runtime/site. D is derived and never planned directly."
+          },
+          "unit": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "How the number is collected — an existing tool/output, never new target-specific code written by this toolkit."
+          },
+          "threshold": {
+            "type": "object",
+            "required": ["kind", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "type": "string", "enum": ["max", "min"] },
+              "value": { "type": "number" }
+            }
+          },
+          "instrumentMissing": {
+            "type": "boolean",
+            "description": "true = no source tool exists in the target yet; numbers cannot be collected until the prescription is adopted."
+          }
+        }
+      }
+    }
+  }
+}

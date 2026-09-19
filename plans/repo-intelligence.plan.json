@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "target": "repo-intelligence",
+  "createdAt": "2026-09-19T04:00:24.169Z",
+  "status": "draft",
+  "basedOnProfile": "/tmp/profile-ri.json",
+  "tooling": [
+    {
+      "concern": "unit",
+      "tool": "Vitest",
+      "rationale": "code present but no unit-test runner detected",
+      "present": false
+    },
+    {
+      "concern": "workflow-telemetry",
+      "tool": "repo-intelligence (measure/insight)",
+      "rationale": "gate pass-rates, gate runtimes and rework loops are workflow metrics; record them via this toolkit",
+      "present": false
+    }
+  ],
+  "metrics": [
+    {
+      "id": "workflow.gate.passRate",
+      "layer": "B",
+      "unit": "ratio",
+      "description": "fraction of gate runs green",
+      "source": "record each gate run via measure (tool = the gate command)",
+      "threshold": {
+        "kind": "min",
+        "value": 0.95
+      }
+    },
+    {
+      "id": "workflow.gate.durationMs",
+      "layer": "B",
+      "unit": "ms",
+      "description": "gate battery runtime (cost of verification)",
+      "source": "time the gate command, record via measure"
+    },
+    {
+      "id": "workflow.rework.loops",
+      "layer": "B",
+      "unit": "count",
+      "description": "fix-verify loops per task",
+      "source": "task log / agent session notes",
+      "threshold": {
+        "kind": "max",
+        "value": 2
+      }
+    }
+  ]
+}

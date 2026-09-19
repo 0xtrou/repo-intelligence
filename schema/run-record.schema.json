@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "repo-intelligence/run-record.schema.json",
+  "title": "RunRecord",
+  "description": "One immutable measurement record. Records are append-only; never rewrite history.",
+  "type": "object",
+  "required": ["schemaVersion", "target", "tool", "capturedAt", "metrics"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Additive-only evolution: bump to 2 only when required fields change; old records stay readable."
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "description": "The repo/harness being measured."
+    },
+    "tool": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What produced the numbers, e.g. 'audit:browser', 'lighthouse', 'manual'."
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp, set by the measure step; never hand-written."
+    },
+    "wisdom": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Which model/variant produced this run. Required when comparing wisdoms."
+    },
+    "fixtures": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Fixture-set label. Wisdom comparisons are only valid when fixtures are identical."
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Correlation id grouping records from one run."
+    },
+    "metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-zA-Z0-9]*(\\.[a-z][a-zA-Z0-9]*)+$",
+        "description": "Dot notation, lowercase domains, camelCase segments: runtime.lcpMs — see METRICS.md."
+      },
+      "additionalProperties": {
+        "type": ["number", "boolean"],
+        "description": "Numbers for gradable metrics; booleans only for binary facts. No strings."
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free text context for this run."
+    }
+  }
+}
