@@ -6,6 +6,7 @@ Dedicated agent skills for this repo — plain markdown, no tool-specific lock-i
 |---|---|
 | [`repo-intelligence/SKILL.md`](repo-intelligence/SKILL.md) | The canonical skill: capability map, four-phase loop, hard rules, extension protocol, report format |
 | [`repo-intelligence/references/recipes.md`](repo-intelligence/references/recipes.md) | Step-by-step recipes: first benchmark, baseline rounds, recording tool output, wisdom comparisons, adding metrics, editing the toolkit |
+| [`intelligence-output/SKILL.md`](intelligence-output/SKILL.md) | The per-project publishing contract: every project gets a committed `intelligence/` folder — MODEL.md (loops, expansions, blind spots), PROFILE.md, PLAN.md, append-only insights/, DECISIONS.md |
 
 ## How agents load these
 

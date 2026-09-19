@@ -116,6 +116,14 @@ The toolkit **suggests; you decide**:
 - **Coverage gaps:** planned-but-never-measured metrics, per-wisdom holes, child targets worth profiling.
 - **Rebalance:** the phase diagnosis and what to optimize now (growth? profit? repair?) — grounded in the matrix, signed by the user when it changes the plan.
 
+## Publishing — the target's intelligence/ folder
+
+Intelligence outputs are published into the target project itself, not kept only in this toolkit:
+every benchmarked project gets a committed `intelligence/` folder (MODEL.md, PROFILE.md, PLAN.md,
+append-only `insights/`, DECISIONS.md). The artifact contract and rules live in the companion skill
+[`skills/intelligence-output/SKILL.md`](../intelligence-output/SKILL.md) — follow it whenever a run
+completes.
+
 ## When to read what
 
 - Concrete step-by-step scenarios (first benchmark, baseline round, recording existing tool output, wisdom comparison, adding metrics, editing this toolkit) → [references/recipes.md](references/recipes.md) — read before your first run with this skill.

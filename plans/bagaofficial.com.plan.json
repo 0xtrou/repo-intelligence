@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "target": "bagaofficial.com",
-  "createdAt": "2026-09-19T06:06:06.915Z",
-  "status": "draft",
-  "basedOnProfile": "/tmp/ri-profile-baga.json",
+  "createdAt": "2026-09-19T06:23:48.502Z",
+  "status": "confirmed",
+  "basedOnProfile": "/tmp/ri-profile.json",
   "tooling": [
     {
       "concern": "e2e",
@@ -212,5 +212,6 @@
       },
       "instrumentMissing": true
     }
-  ]
+  ],
+  "phase": "exploration"
 }
