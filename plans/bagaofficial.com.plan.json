@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "target": "bagaofficial.com",
+  "createdAt": "2026-09-19T04:37:44.296Z",
+  "status": "confirmed",
+  "basedOnProfile": "/tmp/ri-profile.json",
+  "tooling": [
+    {
+      "concern": "e2e",
+      "tool": "Playwright",
+      "rationale": "already in the target — cross-browser e2e with custom viewports",
+      "present": true
+    },
+    {
+      "concern": "e2e",
+      "tool": "Maestro",
+      "rationale": "flows already present — user-journey e2e driven by stable visible-text anchors",
+      "present": true
+    },
+    {
+      "concern": "unit",
+      "tool": "Vitest",
+      "rationale": "already in the target",
+      "present": true
+    },
+    {
+      "concern": "accessibility",
+      "tool": "axe-core",
+      "rationale": "already in the target",
+      "present": true
+    },
+    {
+      "concern": "performance",
+      "tool": "Lighthouse CI (+ web-vitals for field CWV)",
+      "rationale": "no performance instrument detected — most harnesses measure correctness well and leave \"fast\" an unmeasured claim",
+      "present": false
+    },
+    {
+      "concern": "visual-regression",
+      "tool": "Maestro assertScreenshot",
+      "rationale": "reference screenshots as version-controlled evidence (re-baseline deliberately only)",
+      "present": true
+    },
+    {
+      "concern": "workflow-telemetry",
+      "tool": "repo-intelligence (measure/insight)",
+      "rationale": "gate pass-rates, gate runtimes and rework loops are workflow metrics; record them via this toolkit",
+      "present": false
+    }
+  ],
+  "metrics": [
+    {
+      "id": "workflow.gate.passRate",
+      "layer": "B",
+      "unit": "ratio",
+      "description": "fraction of gate runs green",
+      "source": "record each gate run via measure (tool = the gate command)",
+      "threshold": {
+        "kind": "min",
+        "value": 0.95
+      }
+    },
+    {
+      "id": "workflow.gate.durationMs",
+      "layer": "B",
+      "unit": "ms",
+      "description": "gate battery runtime (cost of verification)",
+      "source": "time the gate command, record via measure"
+    },
+    {
+      "id": "workflow.rework.loops",
+      "layer": "B",
+      "unit": "count",
+      "description": "fix-verify loops per task",
+      "source": "task log / agent session notes",
+      "threshold": {
+        "kind": "max",
+        "value": 2
+      }
+    },
+    {
+      "id": "runtime.lcpMs",
+      "layer": "C",
+      "unit": "ms",
+      "description": "Largest Contentful Paint",
+      "source": "Lighthouse (lab) / web-vitals (field)",
+      "threshold": {
+        "kind": "max",
+        "value": 2500
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "runtime.cls",
+      "layer": "C",
+      "unit": "score",
+      "description": "Cumulative Layout Shift",
+      "source": "Lighthouse (lab) / web-vitals (field)",
+      "threshold": {
+        "kind": "max",
+        "value": 0.1
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "runtime.ttfbMs",
+      "layer": "C",
+      "unit": "ms",
+      "description": "Time to First Byte",
+      "source": "Lighthouse / server timing",
+      "threshold": {
+        "kind": "max",
+        "value": 800
+      },
+      "instrumentMissing": true
+    },
+    {
+      "id": "runtime.transferBytes",
+      "layer": "C",
+      "unit": "bytes",
+      "description": "page weight (transfer size)",
+      "source": "Lighthouse / HAR",
+      "instrumentMissing": true
+    },
+    {
+      "id": "a11y.violations",
+      "layer": "C",
+      "unit": "count",
+      "description": "axe violations (scoped ruleset)",
+      "source": "axe run",
+      "threshold": {
+        "kind": "max",
+        "value": 0
+      },
+      "instrumentMissing": false
+    },
+    {
+      "id": "visual.matchScore",
+      "layer": "C",
+      "unit": "ratio",
+      "description": "visual-regression match (Maestro assertScreenshot)",
+      "source": "maestro test flows (.maestro/flows/*.yaml)",
+      "threshold": {
+        "kind": "min",
+        "value": 0.95
+      },
+      "instrumentMissing": false
+    },
+    {
+      "id": "build.sizeBytes",
+      "layer": "C",
+      "unit": "bytes",
+      "description": "build artifact size (dist/)",
+      "source": "du on dist/ after npm run build",
+      "instrumentMissing": false
+    }
+  ]
+}

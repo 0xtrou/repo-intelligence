@@ -77,6 +77,52 @@ test('web metrics include layer C with instrumentMissing flags when tools are ab
   assert.equal(a11y?.instrumentMissing, true); // no axe-core in the fixture
 });
 
+test('Inside–Outside: outward surface adds external-monitoring prescription and layer E metrics', () => {
+  const p = webApp();
+  p.outward = {
+    declares: { bin: [], private: true, workspaces: [], publishConfig: false },
+    contractFiles: ['openapi.json'],
+    gitRemote: 'https://github.com/0xtrou/some-repo.git',
+  };
+  p.deps.prod = ['astro'];
+
+  // tooling: external-monitoring prescribed via existing generic tools
+  const tooling = buildTooling(p);
+  const monitoring = tooling.find((t) => t.concern === 'external-monitoring');
+  assert.ok(monitoring);
+  assert.equal(monitoring?.present, false);
+
+  // metrics: external.* (web + contract) + perception.* (github remote)
+  const metrics = buildMetrics(p);
+  const eMetrics = metrics.filter((m) => m.layer === 'E');
+  const eIds = eMetrics.map((m) => m.id);
+  for (const id of ['external.api.errorRate', 'external.api.latencyMs', 'external.contract.drift', 'perception.github.stars', 'perception.github.openIssues', 'perception.dep.deprecatedCount']) {
+    assert.ok(eIds.includes(id), `expected ${id} in plan`);
+  }
+  assert.ok(eMetrics.every((m) => m.instrumentMissing === true), 'layer E starts instrument-missing');
+  assert.ok(!eIds.includes('perception.npm.downloadsWeekly'), 'private package must not prescribe npm downloads');
+});
+
+test('Inside–Outside: fully internal target gets no outward prescriptions', () => {
+  const metrics = buildMetrics(profile());
+  assert.ok(metrics.every((m) => m.layer === 'B'));
+  assert.ok(!metrics.some((m) => m.id.startsWith('external.') || m.id.startsWith('perception.')));
+  assert.equal(buildTooling(profile()).find((t) => t.concern === 'external-monitoring'), undefined);
+});
+
+test('Inside–Outside: a GitHub remote alone prescribes perception metrics and monitoring', () => {
+  const p = profile();
+  p.outward = {
+    declares: { bin: [], private: true, workspaces: [], publishConfig: false },
+    contractFiles: [],
+    gitRemote: 'git@github.com:0xtrou/private-lib.git',
+  };
+  const metrics = buildMetrics(p);
+  assert.ok(metrics.some((m) => m.id === 'perception.github.stars' && m.layer === 'E'));
+  const monitoring = buildTooling(p).find((t) => t.concern === 'external-monitoring');
+  assert.ok(monitoring, 'a public remote is a world-facing surface');
+});
+
 test('non-web targets get only layer B metrics (no runtime/site metrics)', () => {
   const metrics = buildMetrics(profile());
   assert.ok(metrics.every((m) => m.layer === 'B'));

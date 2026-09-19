@@ -4,6 +4,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { RepoProfile, SCHEMA_VERSION } from './types';
 
 export const SKIP_DIRS = new Set([
@@ -168,6 +169,70 @@ export function readPackageJson(root: string): { deps: string[]; dev: string[]; 
   }
 }
 
+// ---------- Inside–Outside model: BOUNDARY declarations (manifests only) ----------
+
+export interface OutwardDeclarations {
+  bin: string[];
+  private: boolean | null;
+  workspaces: string[];
+  publishConfig: boolean;
+}
+
+/** Contract-named files at the repo root — generic, name-based, framework-agnostic. */
+export const CONTRACT_FILE_NAMES = [
+  'openapi.json', 'openapi.yaml', 'openapi.yml',
+  'swagger.json', 'swagger.yaml', 'swagger.yml',
+  'schema.graphql', 'schema.graphqls',
+];
+
+export function findContractFiles(root: string): string[] {
+  return CONTRACT_FILE_NAMES.filter((name) => fs.existsSync(path.join(root, name)));
+}
+
+export function readOutwardDeclarations(root: string): OutwardDeclarations {
+  const file = path.join(root, 'package.json');
+  if (!fs.existsSync(file)) {
+    return { bin: [], private: null, workspaces: [], publishConfig: false };
+  }
+  try {
+    const pkg = JSON.parse(fs.readFileSync(file, 'utf8')) as {
+      name?: string;
+      bin?: string | Record<string, string>;
+      private?: boolean;
+      workspaces?: string[] | { packages?: string[] };
+      publishConfig?: unknown;
+    };
+    const binNames = typeof pkg.bin === 'string'
+      ? [pkg.name ?? path.basename(pkg.bin)]
+      : Object.keys(pkg.bin ?? {});
+    const workspaces = Array.isArray(pkg.workspaces)
+      ? pkg.workspaces
+      : pkg.workspaces?.packages ?? [];
+    return {
+      bin: binNames,
+      private: typeof pkg.private === 'boolean' ? pkg.private : null,
+      workspaces,
+      publishConfig: pkg.publishConfig !== undefined,
+    };
+  } catch {
+    return { bin: [], private: null, workspaces: [], publishConfig: false };
+  }
+}
+
+/** The world-facing pointer of the repo, as declared by its own git config. Null when absent. */
+export function gitRemoteUrl(root: string): string | null {
+  try {
+    const out = execFileSync('git', ['-C', root, 'remote', 'get-url', 'origin'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const url = out.trim();
+    return url.length > 0 ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Assemble a RepoProfile for any directory. Throws when the path is not a readable directory. */
 export function buildProfile(root: string): RepoProfile {
   const resolved = path.resolve(root);
@@ -229,6 +294,11 @@ export function buildProfile(root: string): RepoProfile {
       ciWorkflows,
       gateScripts,
       toolingPresent,
+    },
+    outward: {
+      declares: readOutwardDeclarations(resolved),
+      contractFiles: findContractFiles(resolved),
+      gitRemote: gitRemoteUrl(resolved),
     },
     notes,
   };

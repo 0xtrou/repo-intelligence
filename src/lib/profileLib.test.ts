@@ -14,11 +14,16 @@ function makeFixture(): string {
   };
   write('package.json', JSON.stringify({
     name: 'fixture',
+    private: true,
+    bin: { 'fixture-cli': './bin.js' },
+    workspaces: ['packages/*'],
+    publishConfig: { access: 'restricted' },
     scripts: { test: 'vitest run', build: 'astro build', deploy: 'wrangler deploy' },
     dependencies: { astro: '^1.0.0' },
     devDependencies: { vitest: '^1.0.0', '@playwright/test': '^1.0.0' },
   }));
   write('package-lock.json', '{"lockfileVersion": 3}\n');
+  write('openapi.json', '{"openapi": "3.0.0"}\n');
   write('AGENTS.md', '# rules\n');
   write('.github/workflows/ci.yml', 'on: push\n');
   // 3 lines each (trailing newline excluded by countLines semantics: a\nb\nc\n = 3 lines)
@@ -60,6 +65,14 @@ test('buildProfile inventories a fixture repo', () => {
   assert.ok(profile.stack.frameworks.includes('Playwright'));
   assert.ok(profile.stack.packageManagers.includes('npm'));
   assert.ok(profile.workflow.toolingPresent.includes('Maestro'));
+
+  // Inside–Outside model: BOUNDARY declarations from manifests only
+  assert.deepEqual(profile.outward?.declares.bin, ['fixture-cli']);
+  assert.equal(profile.outward?.declares.private, true);
+  assert.deepEqual(profile.outward?.declares.workspaces, ['packages/*']);
+  assert.equal(profile.outward?.declares.publishConfig, true);
+  assert.deepEqual(profile.outward?.contractFiles, ['openapi.json']);
+  assert.equal(profile.outward?.gitRemote, null); // tmp fixture is not a git repo
 });
 
 test('buildProfile throws on a non-directory path', () => {

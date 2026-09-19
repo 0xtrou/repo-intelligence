@@ -12,6 +12,19 @@ function hasFramework(profile: RepoProfile, name: string): boolean {
   return profile.stack.frameworks.includes(name) || profile.workflow.toolingPresent.includes(name);
 }
 
+/** True when the target declares a world-facing surface (web routes, contracts, bins, public package, public remote). */
+function hasOutwardSurface(profile: RepoProfile): boolean {
+  const outward = profile.outward;
+  return (
+    hasWebRoutes(profile) ||
+    (outward !== undefined &&
+      (outward.contractFiles.length > 0 ||
+        outward.declares.bin.length > 0 ||
+        outward.declares.private === false ||
+        outward.gitRemote?.includes('github.com') === true))
+  );
+}
+
 export function buildTooling(profile: RepoProfile): ToolPrescription[] {
   const tooling: ToolPrescription[] = [];
   const web = hasWebRoutes(profile);
@@ -115,6 +128,17 @@ export function buildTooling(profile: RepoProfile): ToolPrescription[] {
     present: false,
   });
 
+  // external monitoring — Inside–Outside model: BOUNDARY + OUTSIDE numbers come from
+  // existing world-facing tools, ingested via measure. Never new target-specific code.
+  if (hasOutwardSurface(profile)) {
+    tooling.push({
+      concern: 'external-monitoring',
+      tool: 'generic: gh api / npm registry / target monitors / manual probes',
+      rationale: 'the target has a declared world-facing surface; external.* and perception.* metrics are collected from sources that exist and recorded via measure',
+      present: false,
+    });
+  }
+
   return tooling;
 }
 
@@ -197,6 +221,83 @@ export function buildMetrics(profile: RepoProfile): MetricDefinition[] {
         instrumentMissing: axeMissing,
       }
     );
+  }
+
+  // Layer E — outward (see METRICS.md and the Inside–Outside model in PHILOSOPHY.md).
+  const outward = profile.outward;
+  if (web) {
+    metrics.push(
+      {
+        id: 'external.api.errorRate',
+        layer: 'E',
+        unit: 'ratio',
+        description: 'error rate of the API the repo exposes',
+        source: 'target monitors / probe scripts / manual',
+        threshold: { kind: 'max', value: 0.01 },
+        instrumentMissing: true,
+      },
+      {
+        id: 'external.api.latencyMs',
+        layer: 'E',
+        unit: 'ms',
+        description: 'latency of the exposed API surface',
+        source: 'target monitors / probes',
+        threshold: { kind: 'max', value: 800 },
+        instrumentMissing: true,
+      }
+    );
+  }
+  if (outward !== undefined && outward.contractFiles.length > 0) {
+    metrics.push({
+      id: 'external.contract.drift',
+      layer: 'E',
+      unit: 'count',
+      description: 'consumer-visible contract mismatches detected',
+      source: 'contract tests of the target',
+      threshold: { kind: 'max', value: 0 },
+      instrumentMissing: true,
+    });
+  }
+  if (outward?.gitRemote?.includes('github.com')) {
+    metrics.push(
+      {
+        id: 'perception.github.stars',
+        layer: 'E',
+        unit: 'count',
+        description: 'GitHub stars',
+        source: 'gh api repos/<owner>/<repo>',
+        instrumentMissing: true,
+      },
+      {
+        id: 'perception.github.openIssues',
+        layer: 'E',
+        unit: 'count',
+        description: 'open issues',
+        source: 'gh api repos/<owner>/<repo>',
+        instrumentMissing: true,
+      }
+    );
+  }
+  if (outward !== undefined && outward.declares.private === false) {
+    metrics.push({
+      id: 'perception.npm.downloadsWeekly',
+      layer: 'E',
+      unit: 'count',
+      description: 'weekly downloads of the published package',
+      source: 'npm registry',
+      instrumentMissing: true,
+    });
+  }
+  if (profile.deps.prod.length > 0) {
+    metrics.push({
+      id: 'perception.dep.deprecatedCount',
+      layer: 'E',
+      unit: 'count',
+      description: 'declared deps deprecated upstream',
+      source: 'npm registry check of deps',
+      threshold: { kind: 'max', value: 0 },
+      instrumentMissing: true,
+    });
   }
 
   return metrics;

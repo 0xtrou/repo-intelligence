@@ -4,7 +4,10 @@
 (`profile`), prescribes tooling and defines metrics with thresholds (`plan`), captures measurements
 into an append-only time series (`measure`), and derives insights including AI-model/workflow-variant
 comparisons (`insight`). It is a **meta-layer**: it prescribes and measures — it never implements the
-target repo's own test/tooling code (no Maestro flows, no Playwright specs for targets).
+target repo's own test/tooling code (no Maestro flows, no Playwright specs for targets). The
+**Inside–Outside model** (PHILOSOPHY.md) covers three zones: INSIDE (scanned), BOUNDARY (declared +
+prescribed as `external.*`), OUTSIDE (world-reported as `perception.*`) — the meta names the zones,
+the meta does not go exploring.
 
 **Start here if you are an agent:** `skills/repo-intelligence/SKILL.md` (capability map + rules),
 then `skills/repo-intelligence/references/recipes.md` (step-by-step scenarios).
@@ -37,7 +40,7 @@ docs/assets/     README diagram
 1. **Append-only `runs/`:** never edit, reorder, or delete lines in any `runs/*.jsonl`.
 2. **Canonical single source:** metric ids/units → `METRICS.md`; thresholds → plan files; numbers → runs. Never duplicate a definition; docs and code must not drift.
 3. **Additive-only schema evolution:** never rename or repurpose a metric id or schema field (deprecate + add).
-4. **Nothing target-specific gets hard-coded here** — the toolkit must stay generic.
+4. **Nothing target-specific gets hard-coded here** — the toolkit must stay generic. The profile records only *declared* boundary surface (manifests, git remote); never parse the target's frameworks to discover endpoints or consume-source URLs.
 5. **Plans are user-signed:** never flip a plan to `confirmed` without explicit user approval; never judge records against an unconfirmed plan.
 6. **Every number cites its tool** (`--tool`); fake or placeholder numbers are never recorded.
 7. **Conventional Commits enforced** (commitlint + husky): pre-commit runs `typecheck` + `test`; the commit message must be `feat|fix|docs|refactor|test|chore|build|ci|style|perf|revert: …`.

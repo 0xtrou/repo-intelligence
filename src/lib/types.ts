@@ -25,6 +25,16 @@ export interface RepoProfile {
     gateScripts: string[];
     toolingPresent: string[];
   };
+  /**
+   * Inside–Outside model: BOUNDARY declarations, as stated by the target's own
+   * manifests. The profile never parses frameworks to discover endpoints —
+   * declaring the surface is the target's job (see PHILOSOPHY.md).
+   */
+  outward?: {
+    declares: { bin: string[]; private: boolean | null; workspaces: string[]; publishConfig: boolean };
+    contractFiles: string[];
+    gitRemote: string | null;
+  };
   notes: string[];
 }
 
@@ -37,7 +47,8 @@ export type ToolConcern =
   | 'cross-device'
   | 'accessibility'
   | 'performance'
-  | 'workflow-telemetry';
+  | 'workflow-telemetry'
+  | 'external-monitoring';
 
 export interface ToolPrescription {
   concern: ToolConcern;
@@ -50,7 +61,8 @@ export interface ToolPrescription {
 export interface MetricDefinition {
   /** Must exist in METRICS.md (canonical vocabulary). */
   id: string;
-  layer: 'B' | 'C';
+  /** B=workflow, C=runtime/site, E=outward (external.* + perception.*). */
+  layer: 'B' | 'C' | 'E';
   unit: string;
   description: string;
   source: string;

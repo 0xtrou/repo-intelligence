@@ -32,12 +32,15 @@ Read [PHILOSOPHY.md](PHILOSOPHY.md) first — it is the constitution. Metric voc
 
 | # | Layer | Business analogy | Question it answers | Artifact | Command |
 |---|---|---|---|---|---|
-| 1 | **Understand** | business model canvas | "What is this repo?" | `RepoProfile` | `npm run profile -- <target>` |
-| 2 | **Define good** | strategy & KPIs | "Which tools, which metrics A/B/C, which thresholds?" | `MeasurementPlan` | `npm run plan -- <profile.json>` |
+| 1 | **Understand** | business model canvas | "What is this repo — inside, boundary, outside?" | `RepoProfile` | `npm run profile -- <target>` |
+| 2 | **Define good** | strategy & KPIs | "Which tools, which metrics A/B/C/E, which thresholds?" | `MeasurementPlan` | `npm run plan -- <profile.json>` |
 | 3 | **Measure** | business metrics | "Where are we today?" | `RunRecord`s (append-only time series) | `npm run measure -- <target> <record.json>` |
 | 4 | **Intelligence** | BI & decisions | "What do we do next? Which wisdom wins?" | insight report | `npm run insight -- <target>` |
 
 Layer 2 output is always a **draft until the user confirms** — the architect advises, the human decides.
+The **Inside–Outside model** (see [PHILOSOPHY.md](PHILOSOPHY.md)) makes the market-facing dimension
+un-skippable: INSIDE is scanned, BOUNDARY is declared and prescribed as `external.*`, OUTSIDE is
+world-reported as `perception.*` — the meta names the zones, the meta does not go exploring.
 
 ## Quickstart
 

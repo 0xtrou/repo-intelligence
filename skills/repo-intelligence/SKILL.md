@@ -21,8 +21,8 @@ target-repo test code, you have crossed the boundary — stop and go back to pre
 
 | Command (run from TOOLKIT) | Layer | What it does | Key flags |
 |---|---|---|---|
-| `npm run profile -- <repo-path>` | 1 Understand | Scan ANY repo → `RepoProfile` (stack, LOC, routes, tests, workflow docs, CI, gate scripts) | `--json` (machine-readable), `--out <file>` |
-| `npm run plan -- <profile.json>` | 2 Define good | Draft `MeasurementPlan`: tooling prescriptions + metric definitions with thresholds → `plans/<target>.plan.json` | `--confirm` (sign-off), `--out <file>` |
+| `npm run profile -- <repo-path>` | 1 Understand | Scan ANY repo → `RepoProfile`: INSIDE inventory (stack, LOC, routes, tests, workflow, CI) + **declared BOUNDARY** (`outward.declares`, `contractFiles`, `gitRemote`) | `--json` (machine-readable), `--out <file>` |
+| `npm run plan -- <profile.json>` | 2 Define good | Draft `MeasurementPlan`: tooling prescriptions + metric definitions with thresholds — Layer B/C **and Layer E** (`external.*`, `perception.*`) → `plans/<target>.plan.json` | `--confirm` (sign-off), `--out <file>` |
 | `npm run measure -- <target> <record.json>` | 3 Measure | Validate + **append** `RunRecord` → `runs/<target>.jsonl` (append-only, never overwrites) | `--tool` (required), `--wisdom`, `--fixtures`, `--runId`, `--note`, `--capturedAt <iso>` (backfill) |
 | `npm run insight -- <target>` | 4 Intelligence | Aggregate history: baseline→latest Δ, threshold verdicts, gate health, per-wisdom comparison | `--wisdom <w>` (filter), `--json` (machine-readable) |
 | `npm run typecheck` / `npm test` | dev gates | Only when editing this toolkit itself | — |
@@ -34,12 +34,20 @@ Values must be finite numbers or booleans — invalid records are rejected and *
 ## The four-phase loop (run in order — skipping a phase makes the next one guesswork)
 
 **Phase 1 — Understand.** `npm run profile -- <target-repo-path> --out /tmp/ri-profile.json`, then read
-the JSON together with the target's own docs (AGENTS.md, CI, gates). Read-only on the target.
+the JSON together with the target's own docs (AGENTS.md, CI, gates). Read-only on the target. The
+profile covers the **Inside–Outside model** (PHILOSOPHY.md): INSIDE (ops) + declared BOUNDARY. While
+reading, form answers to the three zone questions — *what is it internally, what crosses the line,
+how does the world see it* — and note anything the target should be declaring. Do not parse the
+target's frameworks to discover endpoints; the boundary surface is the target's declaration.
 
 **Phase 2 — Define good.** `npm run plan -- /tmp/ri-profile.json` → drafts `plans/<target>.plan.json`.
-**Hard gate:** present the draft (tooling prescriptions + metrics + thresholds) to the user and wait for
-explicit confirmation; only then re-run with `--confirm`. Never judge records against an unconfirmed plan.
-Thresholds are suggestions — if the user adjusts them, edit the plan file values before confirming.
+The draft includes Layer E prescriptions (`external.*` for the exchange health, `perception.*` for the
+world's view) whenever the target has a world-facing surface (web routes, contracts, bins, public
+package, public remote) — each marked `instrumentMissing` with a source that exists (`gh api`, npm
+registry, target monitors). **Hard gate:** present the draft (tooling prescriptions + metrics +
+thresholds, inside AND outside) to the user and wait for explicit confirmation; only then re-run with
+`--confirm`. Never judge records against an unconfirmed plan. Thresholds are suggestions — if the user
+adjusts them, edit the plan file values before confirming.
 
 **Phase 3 — Measure.** One record per gate run / tool run / task, via
 `npm run measure -- <target> <record.json> --tool <source>`. Every number cites its tool. For backfilling

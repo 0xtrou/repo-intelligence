@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "target": "repo-intelligence",
-  "createdAt": "2026-09-19T04:00:24.169Z",
+  "createdAt": "2026-09-19T05:05:23.760Z",
   "status": "draft",
-  "basedOnProfile": "/tmp/profile-ri.json",
+  "basedOnProfile": "/tmp/ri-profile2.json",
   "tooling": [
     {
       "concern": "unit",
@@ -47,6 +47,34 @@
         "kind": "max",
         "value": 2
       }
+    },
+    {
+      "id": "perception.github.stars",
+      "layer": "E",
+      "unit": "count",
+      "description": "GitHub stars",
+      "source": "gh api repos/<owner>/<repo>",
+      "instrumentMissing": true
+    },
+    {
+      "id": "perception.github.openIssues",
+      "layer": "E",
+      "unit": "count",
+      "description": "open issues",
+      "source": "gh api repos/<owner>/<repo>",
+      "instrumentMissing": true
+    },
+    {
+      "id": "perception.dep.deprecatedCount",
+      "layer": "E",
+      "unit": "count",
+      "description": "declared deps deprecated upstream",
+      "source": "npm registry check of deps",
+      "threshold": {
+        "kind": "max",
+        "value": 0
+      },
+      "instrumentMissing": true
     }
   ]
 }

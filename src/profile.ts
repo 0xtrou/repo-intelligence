@@ -44,6 +44,12 @@ function main(): void {
     console.log(`  CI workflows:   ${workflow.ciWorkflows.join(', ') || '—'}`);
     console.log(`  Gate scripts:   ${workflow.gateScripts.join(', ') || '—'}`);
     console.log(`  Tooling:        ${workflow.toolingPresent.join(', ') || '—'}`);
+    const outward = profile.outward;
+    if (outward !== undefined) {
+      const d = outward.declares;
+      console.log(`  Outward:        bin=[${d.bin.join(', ')}] private=${d.private ?? '—'} workspaces=[${d.workspaces.join(', ')}] contracts=[${outward.contractFiles.join(', ')}]`);
+      console.log(`  Git remote:     ${outward.gitRemote ?? '—'}`);
+    }
     if (outFile !== undefined) console.log(`\nJSON written → ${outFile}`);
   }
 }
