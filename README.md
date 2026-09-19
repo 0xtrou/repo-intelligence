@@ -1,19 +1,43 @@
+<div align="center">
+
 # repo-intelligence
 
-**Architect & benchmark intelligence for any repo or harness.** Understand a repo, prescribe its tooling, define the metrics it must track, capture measurements into a permanent time series, and derive insights — including comparisons between AI models / workflow variants ("wisdoms").
+**Architect & benchmark intelligence for any repo or harness.**
 
-This is a **meta-layer**: it decides and measures, it never implements the target's own test or tooling code. Read [PHILOSOPHY.md](PHILOSOPHY.md) first — it is the constitution.
+Understand a repo, prescribe its tooling, define the metrics it must track, capture measurements
+into a permanent time series, and derive insights — including comparisons between AI models and
+workflow variants ("wisdoms").
+
+This is a **meta-layer**: it decides and measures — it never implements the target's own test or
+tooling code.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Node](https://img.shields.io/badge/node-%E2%89%A520-339933?logo=node.js&logoColor=white)](package.json)
+[![Tests](https://img.shields.io/badge/tests-node:test-3C873A?logo=node.js&logoColor=white)](package.json)
+[![CI](https://github.com/0xtrou/repo-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/0xtrou/repo-intelligence/actions/workflows/ci.yml)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org)
+[![Last commit](https://img.shields.io/github/last-commit/0xtrou/repo-intelligence/main)](https://github.com/0xtrou/repo-intelligence/commits/main)
+
+<img src="docs/assets/four-layer-loop.svg" alt="The four-layer loop: understand → define good → measure → intelligence" width="920">
+
+</div>
+
+---
+
+Read [PHILOSOPHY.md](PHILOSOPHY.md) first — it is the constitution. Metric vocabulary lives in
+[METRICS.md](METRICS.md) (canonical, additive-only).
 
 ## The four-layer model
 
-```
-1. UNDERSTAND   npm run profile -- <target-repo>     → RepoProfile        ("what is this repo?")
-2. DEFINE GOOD  npm run plan -- <profile.json>       → MeasurementPlan    ("which tools, which metrics A/B/C, which thresholds?")
-3. MEASURE      npm run measure -- <target> <record> → RunRecord (append-only runs/<target>.jsonl)
-4. INTELLIGENCE npm run insight -- <target>          → stats, trends, deltas, wisdom comparison
-```
+| # | Layer | Business analogy | Question it answers | Artifact | Command |
+|---|---|---|---|---|---|
+| 1 | **Understand** | business model canvas | "What is this repo?" | `RepoProfile` | `npm run profile -- <target>` |
+| 2 | **Define good** | strategy & KPIs | "Which tools, which metrics A/B/C, which thresholds?" | `MeasurementPlan` | `npm run plan -- <profile.json>` |
+| 3 | **Measure** | business metrics | "Where are we today?" | `RunRecord`s (append-only time series) | `npm run measure -- <target> <record.json>` |
+| 4 | **Intelligence** | BI & decisions | "What do we do next? Which wisdom wins?" | insight report | `npm run insight -- <target>` |
 
-Layer 2 output is always a **draft until the user confirms**. Metric vocabulary lives in [METRICS.md](METRICS.md) (canonical, additive-only).
+Layer 2 output is always a **draft until the user confirms** — the architect advises, the human decides.
 
 ## Quickstart
 
@@ -45,17 +69,53 @@ src/
   plan.ts        Layer 2 — architect: profile → MeasurementPlan draft (tooling + metrics)
   measure.ts     Layer 3 — validate + append RunRecord (append-only)
   insight.ts     Layer 4 — aggregate history → insight report
-  lib/           shared types, JSONL store, tiny CLI parser
+  lib/           shared types, JSONL store, CLI parser (unit-tested)
 runs/            append-only measurement history (committed — history is the point)
 plans/           MeasurementPlans, one file per target (confirmed plans are versioned by git)
 ```
 
 ## Applying it to a harness
 
-1. `profile` the harness's repo. 2. `plan` and confirm the prescription with the team ("needs Maestro for e2e, tracks LCP/CLS/gate-pass-rate…"). 3. Feed records into `measure` — from the harness's existing gates, from external tools, or manually. 4. `insight` after every round. Nothing in the harness repo needs to change to start; making it change is the *prescription's* job, done by the harness's own agents/humans.
+1. `profile` the harness's repo. 2. `plan` and confirm the prescription with the team ("needs
+Maestro for e2e, tracks LCP/CLS/gate-pass-rate…"). 3. Feed records into `measure` — from the
+harness's existing gates, from external tools, or manually. 4. `insight` after every round.
+Nothing in the harness repo needs to change to start; making it change is the *prescription's*
+job, done by the harness's own agents/humans.
 
 Compared wisdoms must share `fixtures` and differ in exactly one variable (principle 9).
 
+## Commit convention
+
+[Conventional Commits](https://www.conventionalcommits.org) are **enforced**: `commitlint` runs on
+every commit message via a husky `commit-msg` hook, and every commit must pass the pre-commit gate.
+
+```
+feat: add a measurable capability        fix: repair incorrect behavior
+docs: documentation only                 refactor: restructure, no behavior change
+test: add/adjust tests                   chore: tooling, deps, metadata
+build · ci · style · perf · revert
+```
+
+Scope is optional: `feat(insight): compare wisdoms on numeric metrics`.
+
+## Development
+
+```bash
+npm run typecheck   # tsc --noEmit, strict
+npm test            # node:test unit suite (runs via ts-node, ~1s)
+```
+
+- Tests use Node's built-in `node:test` runner — zero additional test dependencies.
+- The **pre-commit hook** runs `typecheck` + `test` on every commit; CI (Node 22 & 25) runs the
+  same gates plus a self-application check (`profile` must always work on this repo).
+- Tests sandbox storage writes via the `RI_DATA_DIR` env var — real `runs/` history is never
+  touched by the suite.
+
 ## Related
 
-- The companion ZCode skill (`~/.agents/skills/repo-intelligence/`) runs this loop automatically in agent sessions.
+- The companion ZCode skill (`~/.agents/skills/repo-intelligence/`) runs this loop automatically
+  in agent sessions.
+
+## License
+
+[MIT](LICENSE) © 2026 0xtrou

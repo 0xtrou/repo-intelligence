@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="240" viewBox="0 0 920 240" role="img" aria-label="The four-layer loop: understand, define good, measure, intelligence">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <!-- panel -->
+  <rect x="1" y="1" width="918" height="238" rx="16" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+
+  <!-- layer 1 -->
+  <g>
+    <rect x="28" y="58" width="192" height="88" rx="12" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+    <rect x="28" y="58" width="192" height="8" rx="4" fill="#3b82f6"/>
+    <text x="124" y="92" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1f2937">1 · UNDERSTAND</text>
+    <text x="124" y="113" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#3b82f6">npm run profile</text>
+    <text x="124" y="133" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#6b7280">→ RepoProfile</text>
+  </g>
+
+  <!-- layer 2 -->
+  <g>
+    <rect x="254" y="58" width="192" height="88" rx="12" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+    <rect x="254" y="58" width="192" height="8" rx="4" fill="#8b5cf6"/>
+    <text x="350" y="92" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1f2937">2 · DEFINE GOOD</text>
+    <text x="350" y="113" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#8b5cf6">npm run plan</text>
+    <text x="350" y="133" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#6b7280">→ MeasurementPlan (user-confirmed)</text>
+  </g>
+
+  <!-- layer 3 -->
+  <g>
+    <rect x="480" y="58" width="192" height="88" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+    <rect x="480" y="58" width="192" height="8" rx="4" fill="#10b981"/>
+    <text x="576" y="92" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1f2937">3 · MEASURE</text>
+    <text x="576" y="113" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#10b981">npm run measure</text>
+    <text x="576" y="133" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#6b7280">→ runs/&lt;target&gt;.jsonl (append-only)</text>
+  </g>
+
+  <!-- layer 4 -->
+  <g>
+    <rect x="706" y="58" width="186" height="88" rx="12" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="706" y="58" width="186" height="8" rx="4" fill="#f59e0b"/>
+    <text x="799" y="92" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1f2937">4 · INTELLIGENCE</text>
+    <text x="799" y="113" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#f59e0b">npm run insight</text>
+    <text x="799" y="133" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#6b7280">→ deltas, thresholds, wisdoms</text>
+  </g>
+
+  <!-- forward arrows -->
+  <line x1="220" y1="102" x2="246" y2="102" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="446" y1="102" x2="472" y2="102" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="672" y1="102" x2="698" y2="102" stroke="#9ca3af" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- return arrow: insight back to plan -->
+  <path d="M 799 154 L 799 196 L 350 196 L 350 154" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+  <text x="574" y="216" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-style="italic" fill="#8b5cf6">optimize — next round</text>
+
+  <!-- boundary note -->
+  <text x="460" y="36" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#9ca3af">prescribes and measures · never implements the target repo's own test/tooling code</text>
+</svg>
