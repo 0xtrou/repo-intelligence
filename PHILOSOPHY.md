@@ -49,7 +49,7 @@ A business measures its internal operations *and* its market: what it sells, wha
 
 **3. Ground truth: live capture > spec > memory.** A fresh capture of the running thing beats any document about the thing. Docs are cross-checks, never sources.
 
-**4. Append-only history.** A measurement that overwrites itself is not a measurement. `runs/` only grows: every record is kept, timestamped, and immutable. The baseline must remain visible forever, because "how far we've come" and "are we regressing" are both comparisons against history. (Git provides the second copy; the append-only JSONL provides the stream.)
+**4. Append-only history.** A measurement that overwrites itself is not a measurement. `runs/` only grows: every record is kept, timestamped, and immutable. The baseline must remain visible forever, because "how far we've come" and "are we regressing" are both comparisons against history. (The append-only JSONL lives on the machine that measures and is deliberately gitignored — per-target run data must not pollute the shared toolkit repo.)
 
 **5. Canonical single source.** Each fact has exactly one home: the profile owns inventory, the plan owns thresholds, runs own numbers. Never duplicate a definition — the duplicate is how agents (and humans) get led astray when one copy goes stale.
 

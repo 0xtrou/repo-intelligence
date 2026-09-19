@@ -64,7 +64,7 @@ Comparison is valid **only** when target + fixtures are identical and exactly on
 
 ## Hard rules
 
-1. **`runs/` is append-only.** Never edit, reorder, or delete lines in `runs/*.jsonl` — history is the point.
+1. **`runs/` is append-only.** Never edit, reorder, or delete lines in `runs/*.jsonl` — history is the point. `runs/` and `plans/` are gitignored and stay on the machine that measures — per-target data never pollutes the shared repo.
 2. **Evidence or it didn't happen.** Every number cites `--tool`; every report cites record paths.
 3. **Each fact has one home:** inventory → profile, thresholds → plan, numbers → runs. Never duplicate a definition.
 4. **Thresholds live in the plan, never in records.** Records are facts; plans are judgments.

@@ -73,8 +73,8 @@ src/
   measure.ts     Layer 3 — validate + append RunRecord (append-only)
   insight.ts     Layer 4 — aggregate history → insight report
   lib/           shared types, JSONL store, CLI parser (unit-tested)
-runs/            append-only measurement history (committed — history is the point)
-plans/           MeasurementPlans, one file per target (confirmed plans are versioned by git)
+runs/            append-only measurement history (gitignored — lives where the measuring happens)
+plans/           MeasurementPlans per target (gitignored — per-target working data)
 ```
 
 ## Applying it to a harness

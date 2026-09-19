@@ -1,5 +1,9 @@
 node_modules/
 *.log
 .DS_Store
-# runs/ and plans/ are committed on purpose:
-# append-only measurement history and confirmed plans are the point of this repo.
+
+# Per-target working data stays local — it must not pollute the shared toolkit repo.
+# runs/ is append-only measurement history on the machine that measures (never edited,
+# never committed); plans/ are per-target MeasurementPlans.
+runs/
+plans/

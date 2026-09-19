@@ -29,8 +29,8 @@ PHILOSOPHY.md    constitution — 4-layer model, 10 principles, boundary rule
 METRICS.md       canonical metric vocabulary (additive-only evolution)
 schema/          JSON Schemas: RunRecord, MeasurementPlan
 src/             profile|plan|measure|insight CLIs (thin) + lib/ logic (unit-tested)
-runs/            append-only measurement history — committed, never edited
-plans/           MeasurementPlans per target — draft until user-confirmed
+runs/            append-only measurement history — gitignored, stays local, never edited
+plans/           MeasurementPlans per target — draft until user-confirmed (gitignored)
 skills/          agent skills (canonical; .zcode/skills holds a discovery stub)
 docs/assets/     README diagram
 ```
