@@ -2,6 +2,11 @@
   "name": "repo-intelligence",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xtrou/repo-intelligence.git"
+  },
   "description": "Architect & benchmark intelligence for any repo/harness — prescribe tooling, define metrics, measure, derive insight.",
   "engines": {
     "node": ">=20"
@@ -19,9 +24,9 @@
     "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.2",
-    "@commitlint/config-conventional": "^21.2.2",
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
     "@types/node": "25.9.8",
-    "husky": "^9.1.7"
+    "husky": "9.1.7"
   }
 }
