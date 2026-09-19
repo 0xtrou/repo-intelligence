@@ -17,6 +17,7 @@
     "measure": "ts-node src/measure.ts",
     "insight": "ts-node src/insight.ts",
     "typecheck": "tsc --noEmit",
+    "test": "NODE_OPTIONS='-r ts-node/register' TS_NODE_TRANSPILE_ONLY=1 node --test",
     "prepare": "husky"
   },
   "dependencies": {
