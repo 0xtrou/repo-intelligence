@@ -24,7 +24,12 @@ Not measured over time; re-profiled when the target changes. See `RepoProfile` i
 
 - **INSIDE:** stack, LOC by extension, routes, test files, workflow docs (AGENTS.md/CLAUDE.md), CI workflows, gate-like scripts.
 - **BOUNDARY (declared only):** `outward.declares` (bin, private, workspaces, publishConfig), `outward.contractFiles` (contract-named files at root), `outward.gitRemote`. The profile records what the target *declares in manifests* — it never parses frameworks to discover endpoints.
+- **CHILD SUGGESTIONS:** `childTargets` lists directories with their own manifests (generic scan + declared workspaces). Suggestions only — the agent decides whether to recurse; the profile never descends on its own.
 - Dependency lists (`deps`) are the declared consumption of the package world; they belong to this inventory too.
+
+## Hierarchical targets (recursion)
+
+Targets form a tree: `parent/child` (e.g. `opencode/packages-tui`). The store nests accordingly (`runs/<parent>/<child>.jsonl`), and `insight --rollup <parent>` prints the child × metric matrix. How deep to recurse is the agent's judgment (PHILOSOPHY.md — suggest, don't decide).
 
 ## Layer B — Workflow metrics (agentic performance)
 
@@ -77,9 +82,36 @@ The outside dimension ([Inside–Outside model](PHILOSOPHY.md)). Numbers arrive 
 | `perception.dep.deprecatedCount` | count | declared deps deprecated upstream | = 0 | npm registry check of deps |
 | `perception.docs.surface` | count | public docs artifacts present (README/LICENSE/changelog/contributing) | ≥ 3 | manifest check |
 
+## Layer S — scale metrics (`business.*` + `philosophy.*`)
+
+The fractal ladder made measurable ([PHILOSOPHY.md](PHILOSOPHY.md)). Sources are business analytics, user interviews and audits — never framework parsing. A minimal anchor pair is prescribed in every plan as the standing reminder of the ladder; deeper adoption (the rest of this table) is the agent's and user's call at the Phase-2 gate.
+
+### `business.*` — the value exchange
+
+| Metric id | Unit | Description | Suggested threshold | Typical source |
+|---|---|---|---|---|
+| `business.revenue.monthlyUsd` | usd/month | revenue of the business the repo serves | informational | business analytics / user interview |
+| `business.adoption.growth` | ratio | period-over-period growth of adoption signals (downloads, installs, stars) | informational | registries / `gh api` |
+| `business.contributorVelocity` | count/period | merged contributor PRs per period | informational | `gh api` |
+| `business.mindshare.rank` | rank | position in the market's mental model vs alternatives | informational | surveys / manual |
+
+### `philosophy.*` — serving humans
+
+| Metric id | Unit | Description | Suggested threshold | Typical source |
+|---|---|---|---|---|
+| `philosophy.inclusion.score` | ratio 0–1 | how fully the product serves all humans (`a11y.violations` is the usual code proxy) | ≥ 0.95 | manual audit / a11y records |
+| `philosophy.privacy.egressScore` | ratio 0–1 | data-egress restraint (1 = nothing leaves without consent) | = 1 | egress audit |
+| `philosophy.energy.costProxy` | bytes/task | energy-cost proxy carried by page weight and compute | informational | Lighthouse / HAR |
+| `philosophy.humanBenefit.score` | ratio 0–1 | judged benefit-to-harm balance of the current change | ≥ 0.8 | user interview / manual |
+
+## Phases and coverage
+
+- **Phase** (`exploration | growth | profit | repair`) is a *plan-level judgment*: the agent proposes it from matrix signals, the user signs it, and `plan` stamps it (`--phase`). It re-weights priorities; it is never stored in records.
+- **Coverage** (planned-but-never-measured metrics, per-wisdom gaps, unprofiled children) is Layer D: computed by `insight`, never stored. The gap report is the harness naming its own blind spots.
+
 ## Layer D — Derived (computed, never measured directly)
 
-Produced by `insight` from B+C+E records: per-metric stats (first/latest/min/max), delta vs baseline, trends, threshold pass rates, per-`wisdom` comparison. Layer D values are never stored as records — recomputing them from history is the point.
+Produced by `insight` from B+C+E+S records: per-metric stats (first/latest/min/max), delta vs baseline, trends, threshold pass rates, per-`wisdom` comparison, roll-up matrices across child targets, and coverage gaps. Layer D values are never stored as records — recomputing them from history is the point.
 
 ## Extension rules
 

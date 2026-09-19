@@ -41,6 +41,24 @@ A business measures its internal operations *and* its market: what it sells, wha
 
 ---
 
+## The fractal ladder
+
+The Inside–Outside model applies at every scale, and the scales stack. A repo serves a business model; a business model serves a philosophy of serving humans. The same four questions and the same three zones run at every rung:
+
+| Rung | Question | Numbers come from |
+|---|---|---|
+| **REPO** (artifact) | what is it, what crosses its line, how is it seen | `profile` scans, world tools, the target's own gates |
+| **BUSINESS MODEL** | what value is exchanged, with whom | business analytics of the target / user interview (`business.*`) |
+| **HUMANITY / PHILOSOPHY** | which humans it serves, at what cost, with what respect | audits and judgment (`philosophy.*`) |
+
+**Meaning flows down, evidence flows up.** A code-level number becomes a principle-level fact through the ladder (`a11y.violations = 0` *is* "inclusion"; `transferBytes` *is* an energy cost), and a principle sets the threshold a code metric must meet. Higher-scale metrics are first-class records in the same machinery — never a separate process.
+
+**Suggest, don't decide.** The toolkit names the rungs, lists candidate children, and proposes phases; the agent decides how deep to recurse and when to ascend, and the user signs every direction change. Depth is judgment, not configuration.
+
+**The matrix closes on itself.** Every intelligence round ends in a signed rebalancing decision: coverage gaps (what the plan demands but history lacks), phase diagnosis (`exploration | growth | profit | repair`), and rebalance actions. A harness that can name its own blind spots is the only kind that fills them.
+
+---
+
 ## Principles
 
 **1. Context is the constraint.** An agent (or a new teammate) is only as good as the context it can see, and every repo boundary loses context. Understanding must be an *artifact* (`RepoProfile`), not tribal knowledge in someone's head — any session that starts from the artifact starts from the same truth.
@@ -62,6 +80,10 @@ A business measures its internal operations *and* its market: what it sells, wha
 **9. Wisdom comparison requires normalized fixtures.** Comparing models ("wisdoms") or workflow variants is only valid when target and fixtures are held constant and exactly one variable changes. Every comparable record therefore carries `wisdom` and `fixtures` labels. A comparison without normalization is marketing.
 
 **10. Prescribe, don't implement.** The boundary rule, restated as a principle: this toolkit's output is decisions, definitions, and measurements — never target-specific implementation. This keeps it applicable to *any* harness without growing target-specific baggage.
+
+**11. Depth is suggested; direction is signed.** The toolkit proposes children, rungs, and phases; the agent decides how deep to recurse and when to ascend the ladder; the user signs every rebalance. Automating the mechanics without human sign-off invites drift; requiring sign-off on everything kills autonomy — this is the split.
+
+**12. The matrix closes on itself.** Coverage gaps and phase signals are computed, not felt. Every round, the harness names its own blind spots — unmeasured metrics, unprofiled children, missing wisdom comparisons — and proposes what to rebalance before anything else gets measured.
 
 ---
 
