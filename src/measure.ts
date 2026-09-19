@@ -11,30 +11,9 @@
  */
 import * as fs from 'node:fs';
 import { fail, parseArgs } from './lib/cli';
-import { appendRunRecord, countRecords, loadPlan } from './lib/store';
+import { appendRunRecord, loadPlan } from './lib/store';
+import { ISO_RE, validateMetrics } from './lib/recordLib';
 import { RunRecord, SCHEMA_VERSION } from './lib/types';
-
-// dot notation, lowercase domains, camelCase segments allowed (e.g. runtime.lcpMs, workflow.gate.passRate)
-const METRIC_ID_RE = /^[a-z][a-zA-Z0-9]*(\.[a-z][a-zA-Z0-9]*)+$/;
-const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
-
-interface MetricsFile {
-  metrics?: unknown;
-  [k: string]: unknown;
-}
-
-function extractMetrics(raw: MetricsFile): Record<string, unknown> {
-  if (raw.metrics !== undefined && typeof raw.metrics === 'object' && raw.metrics !== null) {
-    return raw.metrics as Record<string, unknown>;
-  }
-  // bare map: every key that is not a RunRecord wrapper field is a metric
-  const wrapper = new Set(['schemaVersion', 'target', 'tool', 'capturedAt', 'wisdom', 'fixtures', 'runId', 'metrics', 'notes']);
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(raw)) {
-    if (!wrapper.has(k)) out[k] = v;
-  }
-  return out;
-}
 
 function main(): void {
   const { flags, positionals } = parseArgs(process.argv.slice(2));
@@ -52,31 +31,14 @@ function main(): void {
 
   if (tool === undefined) fail('--tool is required — every number must cite what produced it');
 
-  let raw: MetricsFile;
+  let raw: Record<string, unknown>;
   try {
-    raw = JSON.parse(fs.readFileSync(file, 'utf8')) as MetricsFile;
+    raw = JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, unknown>;
   } catch (e) {
     fail(`cannot read record file: ${(e as Error).message}`);
   }
 
-  // validate metrics
-  const metrics: Record<string, number | boolean> = {};
-  const errors: string[] = [];
-  for (const [id, value] of Object.entries(extractMetrics(raw))) {
-    if (!METRIC_ID_RE.test(id)) {
-      errors.push(`metric id "${id}" violates dot notation (see METRICS.md)`);
-      continue;
-    }
-    if (typeof value === 'boolean') {
-      metrics[id] = value;
-    } else if (typeof value === 'number' && Number.isFinite(value)) {
-      metrics[id] = value;
-    } else {
-      errors.push(`metric "${id}" must be a finite number or boolean, got ${JSON.stringify(value)}`);
-    }
-  }
-  if (Object.keys(metrics).length === 0) errors.push('record has no valid metrics');
-
+  const { metrics, errors } = validateMetrics(raw);
   if (errors.length > 0) {
     for (const e of errors) console.error(`invalid: ${e}`);
     console.error('\nnothing was appended — history stays clean');
@@ -125,7 +87,6 @@ function main(): void {
   for (const [id, value] of Object.entries(record.metrics)) {
     console.log(`  ${id} = ${value}`);
   }
-  void countRecords;
 }
 
 main();

@@ -6,11 +6,24 @@ import type { MeasurementPlan, RunRecord } from './types';
  * Storage for runs/ (append-only measurement history) and plans/ (MeasurementPlans).
  * Append-only is enforced by construction: records are written with appendFileSync
  * (O_APPEND), which never truncates. There is deliberately no rewrite or delete API.
+ *
+ * RI_DATA_DIR overrides the data root — used by tests to sandbox the store away
+ * from real history.
  */
 
-const ROOT = path.resolve(__dirname, '..', '..');
-export const RUNS_DIR = path.join(ROOT, 'runs');
-export const PLANS_DIR = path.join(ROOT, 'plans');
+const DEFAULT_ROOT = path.resolve(__dirname, '..', '..');
+
+function rootDir(): string {
+  return path.resolve(process.env.RI_DATA_DIR ?? DEFAULT_ROOT);
+}
+
+export function runsDir(): string {
+  return path.join(rootDir(), 'runs');
+}
+
+export function plansDir(): string {
+  return path.join(rootDir(), 'plans');
+}
 
 const TARGET_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
@@ -22,12 +35,12 @@ export function assertValidTarget(target: string): void {
 
 export function runsFileFor(target: string): string {
   assertValidTarget(target);
-  return path.join(RUNS_DIR, `${target}.jsonl`);
+  return path.join(runsDir(), `${target}.jsonl`);
 }
 
 export function appendRunRecord(record: RunRecord): { file: string; recordNumber: number } {
   const file = runsFileFor(record.target);
-  fs.mkdirSync(RUNS_DIR, { recursive: true });
+  fs.mkdirSync(runsDir(), { recursive: true });
   fs.appendFileSync(file, JSON.stringify(record) + '\n', 'utf8');
   const recordNumber = countRecords(record.target);
   return { file, recordNumber };
@@ -57,9 +70,9 @@ export function loadRunRecords(target: string): RunRecord[] {
 }
 
 export function listTargets(): string[] {
-  if (!fs.existsSync(RUNS_DIR)) return [];
+  if (!fs.existsSync(runsDir())) return [];
   return fs
-    .readdirSync(RUNS_DIR)
+    .readdirSync(runsDir())
     .filter((f) => f.endsWith('.jsonl'))
     .map((f) => f.replace(/\.jsonl$/, ''))
     .sort();
@@ -67,7 +80,7 @@ export function listTargets(): string[] {
 
 export function planFileFor(target: string): string {
   assertValidTarget(target);
-  return path.join(PLANS_DIR, `${target}.plan.json`);
+  return path.join(plansDir(), `${target}.plan.json`);
 }
 
 export function savePlan(plan: MeasurementPlan, outFile?: string): string {
