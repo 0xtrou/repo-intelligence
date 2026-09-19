@@ -25,52 +25,53 @@ tooling code.
 
 ---
 
-## Get started — 5 minutes, fully self-contained
+## Get started — 5 minutes, on your own project
 
-No second repo needed: the toolkit profiles **itself** first (eat your own cooking).
-Requires Node ≥ 20.
+Requires Node ≥ 20. The toolkit is a CLI run from its own folder: it reads your project and
+prescribes for it — it never modifies your code (that boundary is the whole point).
 
 ```bash
-npm install
+# one-time setup
+git clone https://github.com/0xtrou/repo-intelligence.git
+cd repo-intelligence && npm install
 
-# 1. UNDERSTAND — scan this repo → RepoProfile
-npm run profile -- . --out /tmp/ri-profile.json
+# 1. UNDERSTAND — scan YOUR repo → RepoProfile
+npm run profile -- /path/to/your/repo --out /tmp/ri-profile.json
 #    → human summary in the terminal + full JSON at /tmp/ri-profile.json
 
 # 2. DEFINE GOOD — draft a MeasurementPlan: tooling prescriptions + metrics + thresholds
 npm run plan -- /tmp/ri-profile.json
-#    → plans/repo-intelligence.plan.json (status: draft) + summary in the terminal
+#    → plans/<your-repo>.plan.json (status: draft) + summary in the terminal
 
 # 3. SIGN IT — read the draft, then confirm it and stamp the phase
 npm run plan -- /tmp/ri-profile.json --confirm --phase exploration
 
-# 4. MEASURE — record one real number (validated, stamped, appended — never overwritten)
-echo '{"metrics": {"workflow.gate.durationMs": 32000}}' > /tmp/first-record.json
-npm run measure -- my-first-target /tmp/first-record.json --tool manual --note "first record"
-#    → runs/my-first-target.jsonl, record #1
+# 4. MEASURE — record a real number from tools your project already has
+echo '{"metrics": {"workflow.gate.durationMs": 32000}}' > /tmp/first-record.json  # ← your real measurement
+npm run measure -- <your-repo-name> /tmp/first-record.json --tool "your gate command" --note "first record"
+#    → runs/<your-repo-name>.jsonl, record #1
 
 # 5. INTELLIGENCE — aggregate history: baseline, threshold verdicts, coverage gaps
-npm run insight -- my-first-target
+npm run insight -- <your-repo-name>
 ```
 
 That is the **entire loop**: understand → define good → measure → intelligence.
-Everything else in this repo is depth on top of those five commands.
+Everything else is depth on top of those five commands.
 
 > `runs/` and `plans/` are **gitignored by design** — per-target data stays on the machine that
 > measures, and history is append-only: nothing is ever rewritten.
 
-## Apply it to your own project
+### Next steps, once the loop runs
 
-1. **Profile it:** `npm run profile -- /path/to/your/repo --out /tmp/ri-profile.json` — read the
-   summary; it lists child-target suggestions (recurse deliberately, one rung at a time).
-2. **Plan it:** `npm run plan -- /tmp/ri-profile.json` → review the draft with your team → sign with
-   `--confirm` (+ `--phase exploration|growth|profit|repair`).
-3. **Measure it:** feed numbers from tools your project already has (gates, Lighthouse, axe, manual
-   observation) — one JSON record per source, `--tool` cites where every number came from.
-4. **Intelligence it:** `npm run insight -- your-target` after every round; `--rollup` for the
-   child × metric matrix. And publish the project's `intelligence/` folder (MODEL.md, PROFILE.md,
-   PLAN.md, insights/, DECISIONS.md) per the
-   [`intelligence-output`](skills/intelligence-output/SKILL.md) skill.
+- **Publish the project's `intelligence/` folder** — MODEL.md, PROFILE.md, PLAN.md, append-only
+  `insights/`, DECISIONS.md, committed in your repo. The contract lives in the
+  [`intelligence-output`](skills/intelligence-output/SKILL.md) skill.
+- **Recurse deliberately** — the profile lists child targets; `insight --rollup <target>` prints the
+  child × metric matrix. One rung at a time, driven by whichever cells demand attention.
+- **Compare wisdoms** — tag records with `--wisdom` + `--fixtures` to diff AI models / workflow
+  variants on identical fixtures.
+- **Walk the scenarios** — [recipes.md](skills/repo-intelligence/references/recipes.md) has the full
+  paths: first benchmark, baseline rounds, recording tool output, adding metrics.
 
 ## Understand it — reading order
 
@@ -132,6 +133,9 @@ npm test            # node:test unit suite (runs via ts-node, ~1s)
 - Tests use Node's built-in `node:test` runner — zero additional test dependencies.
 - The **pre-commit hook** runs `typecheck` + `test` on every commit; CI (Node 22 & 25) runs the
   same gates plus a self-application check (`profile` must always work on this repo).
+- **Self-application is the maintainers' business, not the onboarding path**: this repo is its own
+  first target (we run our own loop on it — `runs/` and `plans/` here hold real self-measurements),
+  but public users start on *their* projects, per the Get started above.
 - Tests sandbox storage writes via the `RI_DATA_DIR` env var — real `runs/` history is never
   touched by the suite.
 
