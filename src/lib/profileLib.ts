@@ -233,6 +233,35 @@ export function gitRemoteUrl(root: string): string | null {
   }
 }
 
+// ---------- Fractal ladder: child-target suggestions (never auto-descended) ----------
+
+const CHILD_MANIFESTS = ['package.json', 'go.mod', 'Cargo.toml', 'pyproject.toml'];
+const MAX_CHILD_SUGGESTIONS = 20;
+
+/** Suggest sub-targets: directories with their own manifest, depth ≤ 2, generic and framework-agnostic. */
+export function discoverChildTargets(root: string): { name: string; manifest: string }[] {
+  const out: { name: string; manifest: string }[] = [];
+  const visit = (dir: string, rel: string, depth: number): void => {
+    if (depth > 2 || out.length >= MAX_CHILD_SUGGESTIONS) return;
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory() || SKIP_DIRS.has(entry.name) || entry.name.startsWith('.')) continue;
+      const childDir = path.join(dir, entry.name);
+      const childRel = rel !== '' ? `${rel}/${entry.name}` : entry.name;
+      const manifest = CHILD_MANIFESTS.find((m) => fs.existsSync(path.join(childDir, m)));
+      if (manifest !== undefined) out.push({ name: childRel, manifest });
+      visit(childDir, childRel, depth + 1);
+    }
+  };
+  visit(root, '', 0);
+  return out;
+}
+
 /** Assemble a RepoProfile for any directory. Throws when the path is not a readable directory. */
 export function buildProfile(root: string): RepoProfile {
   const resolved = path.resolve(root);
@@ -300,6 +329,7 @@ export function buildProfile(root: string): RepoProfile {
       contractFiles: findContractFiles(resolved),
       gitRemote: gitRemoteUrl(resolved),
     },
+    childTargets: discoverChildTargets(resolved),
     notes,
   };
 }

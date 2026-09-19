@@ -21,10 +21,10 @@ target-repo test code, you have crossed the boundary — stop and go back to pre
 
 | Command (run from TOOLKIT) | Layer | What it does | Key flags |
 |---|---|---|---|
-| `npm run profile -- <repo-path>` | 1 Understand | Scan ANY repo → `RepoProfile`: INSIDE inventory (stack, LOC, routes, tests, workflow, CI) + **declared BOUNDARY** (`outward.declares`, `contractFiles`, `gitRemote`) | `--json` (machine-readable), `--out <file>` |
-| `npm run plan -- <profile.json>` | 2 Define good | Draft `MeasurementPlan`: tooling prescriptions + metric definitions with thresholds — Layer B/C **and Layer E** (`external.*`, `perception.*`) → `plans/<target>.plan.json` | `--confirm` (sign-off), `--out <file>` |
-| `npm run measure -- <target> <record.json>` | 3 Measure | Validate + **append** `RunRecord` → `runs/<target>.jsonl` (append-only, never overwrites) | `--tool` (required), `--wisdom`, `--fixtures`, `--runId`, `--note`, `--capturedAt <iso>` (backfill) |
-| `npm run insight -- <target>` | 4 Intelligence | Aggregate history: baseline→latest Δ, threshold verdicts, gate health, per-wisdom comparison | `--wisdom <w>` (filter), `--json` (machine-readable) |
+| `npm run profile -- <repo-path>` | 1 Understand | Scan ANY repo → `RepoProfile`: INSIDE inventory (stack, LOC, routes, tests, workflow, CI) + **declared BOUNDARY** (`outward.*`, `gitRemote`) + **child-target suggestions** (fractal ladder — never auto-descended) | `--json` (machine-readable), `--out <file>` |
+| `npm run plan -- <profile.json>` | 2 Define good | Draft `MeasurementPlan`: tooling prescriptions + metric definitions with thresholds — Layer B/C/E and the Layer S ladder anchors (`business.*`, `philosophy.*`) → `plans/<target>.plan.json` | `--confirm` (sign-off), `--phase <exploration\|growth\|profit\|repair>`, `--out <file>` |
+| `npm run measure -- <target> <record.json>` | 3 Measure | Validate + **append** `RunRecord` → `runs/<target>.jsonl` (hierarchical targets nest: `runs/<parent>/<child>.jsonl`; append-only, never overwrites) | `--tool` (required), `--wisdom`, `--fixtures`, `--runId`, `--note`, `--capturedAt <iso>` (backfill) |
+| `npm run insight -- <target>` | 4 Intelligence | Aggregate history: baseline→latest Δ, threshold verdicts, **coverage gaps**, per-wisdom comparison; `--rollup` prints the child × metric matrix for a parent | `--rollup`, `--wisdom <w>` (filter), `--json` (machine-readable) |
 | `npm run typecheck` / `npm test` | dev gates | Only when editing this toolkit itself | — |
 
 Record-file shapes accepted by `measure`: `{"metrics": {"runtime.lcpMs": 1200}}` or a bare metric map.
@@ -42,12 +42,12 @@ target's frameworks to discover endpoints; the boundary surface is the target's 
 
 **Phase 2 — Define good.** `npm run plan -- /tmp/ri-profile.json` → drafts `plans/<target>.plan.json`.
 The draft includes Layer E prescriptions (`external.*` for the exchange health, `perception.*` for the
-world's view) whenever the target has a world-facing surface (web routes, contracts, bins, public
-package, public remote) — each marked `instrumentMissing` with a source that exists (`gh api`, npm
-registry, target monitors). **Hard gate:** present the draft (tooling prescriptions + metrics +
-thresholds, inside AND outside) to the user and wait for explicit confirmation; only then re-run with
-`--confirm`. Never judge records against an unconfirmed plan. Thresholds are suggestions — if the user
-adjusts them, edit the plan file values before confirming.
+world's view) whenever the target has a world-facing surface, and the Layer S ladder anchors
+(`business.revenue.monthlyUsd`, `philosophy.inclusion.score`) always. **Hard gate:** present the draft
+(tooling prescriptions + metrics + thresholds — inside, boundary, outside, scales) to the user and wait
+for explicit confirmation; propose the current **phase** (`exploration | growth | profit | repair`) from
+matrix signals and stamp it with `--phase` at sign-off. Never judge records against an unconfirmed plan.
+Thresholds are suggestions — if the user adjusts them, edit the plan file values before confirming.
 
 **Phase 3 — Measure.** One record per gate run / tool run / task, via
 `npm run measure -- <target> <record.json> --tool <source>`. Every number cites its tool. For backfilling
@@ -61,6 +61,22 @@ with a recommendation: what to optimize next. Use `--json` when another tool wil
 Every comparable run carries `--wisdom <label>` (model or variant id) and `--fixtures <set>` (fixture id).
 Comparison is valid **only** when target + fixtures are identical and exactly one variable changes.
 `insight` prints the per-wisdom table and warns when fixture sets are mixed — treat mixed comparisons as invalid.
+
+## The fractal ladder — agent-decided depth (see PHILOSOPHY.md)
+
+The model applies at every scale: repo → business model → humanity, and down: repo → child targets.
+The toolkit **suggests; you decide**:
+
+- **Recurse down deliberately.** `profile` lists child-target suggestions; `insight` shows which
+  child's numbers demand attention (or run `insight --rollup <parent>` for the child × metric matrix).
+  Recurse one rung into the child whose cells demand it — never profile the whole tree at once; depth
+  beyond one rung is spent only when the previous rung's evidence calls for it.
+- **Ascend when a finding needs meaning.** A code number that keeps failing maps upward:
+  `a11y.violations` → `philosophy.inclusion.score`, adoption signals → `business.*`. Propose the
+  higher-scale metric and its threshold; the user signs it at the Phase-2 gate.
+- **Every round ends in a signed rebalance.** Read the coverage gaps from `insight` (planned-but-never-
+  measured, per-wisdom holes), diagnose the phase from matrix signals, and propose rebalanced priorities.
+  Phase changes are stamped with `plan --phase <p> --confirm` — user-signed, never self-granted.
 
 ## Hard rules
 
@@ -81,10 +97,11 @@ Comparison is valid **only** when target + fixtures are identical and exactly on
 ## Report format (what the user receives at the end of a run)
 
 - What was prescribed/measured and why (one paragraph).
-- Plan status: `draft` (waiting on user) or `confirmed` (by whom, when).
+- Plan status: `draft` (waiting on user) or `confirmed` (by whom, when, **phase**).
 - Records appended: file path + record numbers.
 - Insight verdicts: per-metric baseline → latest with Δ, PASS/FAIL vs thresholds, wisdom table if ≥2 wisdoms.
-- **Recommendation:** what to optimize next, grounded in the numbers.
+- **Coverage gaps:** planned-but-never-measured metrics, per-wisdom holes, child targets worth profiling.
+- **Rebalance:** the phase diagnosis and what to optimize now (growth? profit? repair?) — grounded in the matrix, signed by the user when it changes the plan.
 
 ## When to read what
 

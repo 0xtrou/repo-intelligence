@@ -105,9 +105,22 @@ test('Inside–Outside: outward surface adds external-monitoring prescription an
 
 test('Inside–Outside: fully internal target gets no outward prescriptions', () => {
   const metrics = buildMetrics(profile());
-  assert.ok(metrics.every((m) => m.layer === 'B'));
-  assert.ok(!metrics.some((m) => m.id.startsWith('external.') || m.id.startsWith('perception.')));
+  assert.ok(!metrics.some((m) => m.id.startsWith('external.') || m.id.startsWith('perception.') || m.id.startsWith('runtime.')));
   assert.equal(buildTooling(profile()).find((t) => t.concern === 'external-monitoring'), undefined);
+});
+
+test('fractal ladder: the Layer S anchor pair is always prescribed (every repo serves a business and a philosophy)', () => {
+  for (const p of [profile(), webApp()]) {
+    const s = buildMetrics(p).filter((m) => m.layer === 'S');
+    assert.deepEqual(
+      s.map((m) => m.id).sort(),
+      ['business.revenue.monthlyUsd', 'philosophy.inclusion.score']
+    );
+    assert.ok(s.every((m) => m.instrumentMissing === true), 'scale metrics start instrument-missing');
+  }
+  const inclusion = buildMetrics(webApp()).find((m) => m.id === 'philosophy.inclusion.score');
+  assert.equal(inclusion?.threshold?.kind, 'min');
+  assert.equal(inclusion?.threshold?.value, 0.95);
 });
 
 test('Inside–Outside: a GitHub remote alone prescribes perception metrics and monitoring', () => {
@@ -121,12 +134,6 @@ test('Inside–Outside: a GitHub remote alone prescribes perception metrics and 
   assert.ok(metrics.some((m) => m.id === 'perception.github.stars' && m.layer === 'E'));
   const monitoring = buildTooling(p).find((t) => t.concern === 'external-monitoring');
   assert.ok(monitoring, 'a public remote is a world-facing surface');
-});
-
-test('non-web targets get only layer B metrics (no runtime/site metrics)', () => {
-  const metrics = buildMetrics(profile());
-  assert.ok(metrics.every((m) => m.layer === 'B'));
-  assert.ok(metrics.some((m) => m.id === 'workflow.gate.passRate'));
 });
 
 test('instrumentMissing clears once the target has the tool', () => {

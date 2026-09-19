@@ -25,22 +25,27 @@ export function plansDir(): string {
   return path.join(rootDir(), 'plans');
 }
 
-const TARGET_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const SEGMENT_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 export function assertValidTarget(target: string): void {
-  if (!TARGET_RE.test(target)) {
-    throw new Error(`invalid target id "${target}" — must match ${TARGET_RE.source}`);
+  if (target.startsWith('/') || target.endsWith('/')) {
+    throw new Error(`invalid target id "${target}" — no leading/trailing slashes`);
+  }
+  for (const segment of target.split('/')) {
+    if (segment === '' || segment === '.' || segment === '..' || !SEGMENT_RE.test(segment)) {
+      throw new Error(`invalid target id "${target}" — slash-separated segments must match ${SEGMENT_RE.source} (no "..")`);
+    }
   }
 }
 
 export function runsFileFor(target: string): string {
   assertValidTarget(target);
-  return path.join(runsDir(), `${target}.jsonl`);
+  return path.join(runsDir(), ...target.split('/')) + '.jsonl';
 }
 
 export function appendRunRecord(record: RunRecord): { file: string; recordNumber: number } {
   const file = runsFileFor(record.target);
-  fs.mkdirSync(runsDir(), { recursive: true });
+  fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.appendFileSync(file, JSON.stringify(record) + '\n', 'utf8');
   const recordNumber = countRecords(record.target);
   return { file, recordNumber };
@@ -70,17 +75,33 @@ export function loadRunRecords(target: string): RunRecord[] {
 }
 
 export function listTargets(): string[] {
-  if (!fs.existsSync(runsDir())) return [];
-  return fs
-    .readdirSync(runsDir())
-    .filter((f) => f.endsWith('.jsonl'))
-    .map((f) => f.replace(/\.jsonl$/, ''))
-    .sort();
+  const base = runsDir();
+  if (!fs.existsSync(base)) return [];
+  const out: string[] = [];
+  const visit = (dir: string, prefix: string): void => {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        visit(path.join(dir, entry.name), `${prefix}${entry.name}/`);
+      } else if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+        out.push(`${prefix}${entry.name.replace(/\.jsonl$/, '')}`);
+      }
+    }
+  };
+  visit(base, '');
+  return out.sort();
 }
 
 export function planFileFor(target: string): string {
   assertValidTarget(target);
-  return path.join(plansDir(), `${target}.plan.json`);
+  const segments = [...target.split('/')];
+  const last = segments.pop() as string;
+  return path.join(plansDir(), ...segments, `${last}.plan.json`);
 }
 
 export function savePlan(plan: MeasurementPlan, outFile?: string): string {

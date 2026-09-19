@@ -35,6 +35,8 @@ export interface RepoProfile {
     contractFiles: string[];
     gitRemote: string | null;
   };
+  /** Fractal ladder: candidate child targets (manifest-bearing dirs + declared workspaces). Suggestions only — the agent decides whether to recurse. */
+  childTargets?: { name: string; manifest: string }[];
   notes: string[];
 }
 
@@ -61,8 +63,8 @@ export interface ToolPrescription {
 export interface MetricDefinition {
   /** Must exist in METRICS.md (canonical vocabulary). */
   id: string;
-  /** B=workflow, C=runtime/site, E=outward (external.* + perception.*). */
-  layer: 'B' | 'C' | 'E';
+  /** B=workflow, C=runtime/site, E=outward (external.* + perception.*), S=scale (business.* + philosophy.*). */
+  layer: 'B' | 'C' | 'E' | 'S';
   unit: string;
   description: string;
   source: string;
@@ -71,11 +73,15 @@ export interface MetricDefinition {
   instrumentMissing?: boolean;
 }
 
+export type PlanPhase = 'exploration' | 'growth' | 'profit' | 'repair';
+
 export interface MeasurementPlan {
   schemaVersion: number;
   target: string;
   createdAt: string;
   status: 'draft' | 'confirmed';
+  /** Plan-level judgment: proposed by the agent from matrix signals, signed by the user (see METRICS.md — Phases). */
+  phase?: PlanPhase;
   basedOnProfile?: string;
   tooling: ToolPrescription[];
   metrics: MetricDefinition[];

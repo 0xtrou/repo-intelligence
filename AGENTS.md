@@ -7,7 +7,11 @@ comparisons (`insight`). It is a **meta-layer**: it prescribes and measures — 
 target repo's own test/tooling code (no Maestro flows, no Playwright specs for targets). The
 **Inside–Outside model** (PHILOSOPHY.md) covers three zones: INSIDE (scanned), BOUNDARY (declared +
 prescribed as `external.*`), OUTSIDE (world-reported as `perception.*`) — the meta names the zones,
-the meta does not go exploring.
+the meta does not go exploring. The **fractal ladder** extends the same loop across scales
+(repo → business model → humanity, via `business.*`/`philosophy.*`) and down through child targets
+(hierarchical target ids, `insight --rollup`); the toolkit suggests depth, the agent decides it, the
+user signs direction changes. Every intelligence round ends in a signed rebalance: coverage gaps,
+phase diagnosis (`exploration|growth|profit|repair`), rebalanced priorities.
 
 **Start here if you are an agent:** `skills/repo-intelligence/SKILL.md` (capability map + rules),
 then `skills/repo-intelligence/references/recipes.md` (step-by-step scenarios).
@@ -16,10 +20,10 @@ then `skills/repo-intelligence/references/recipes.md` (step-by-step scenarios).
 
 | Command | Purpose |
 |---|---|
-| `npm run profile -- <repo-path> [--json] [--out f]` | Scan any repo → RepoProfile |
-| `npm run plan -- <profile.json> [--confirm] [--out f]` | Draft/confirm MeasurementPlan → `plans/<target>.plan.json` |
-| `npm run measure -- <target> <record.json> --tool <t> [--wisdom w] [--fixtures f]` | Validate + append RunRecord → `runs/<target>.jsonl` |
-| `npm run insight -- <target> [--wisdom w] [--json]` | Baseline deltas, threshold verdicts, wisdom comparison |
+| `npm run profile -- <repo-path> [--json] [--out f]` | Scan any repo → RepoProfile (inside + declared boundary + child-target suggestions) |
+| `npm run plan -- <profile.json> [--confirm] [--phase p] [--out f]` | Draft/confirm MeasurementPlan → `plans/<target>.plan.json` |
+| `npm run measure -- <target> <record.json> --tool <t> [--wisdom w] [--fixtures f]` | Validate + append RunRecord → `runs/<target>.jsonl` (hierarchical ids nest) |
+| `npm run insight -- <target> [--rollup] [--wisdom w] [--json]` | Baseline deltas, threshold verdicts, coverage gaps, wisdom comparison, child×metric roll-up |
 | `npm run typecheck` / `npm test` | Dev gates (pre-commit runs both) |
 
 ## Layout

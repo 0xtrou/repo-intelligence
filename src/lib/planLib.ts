@@ -300,5 +300,28 @@ export function buildMetrics(profile: RepoProfile): MetricDefinition[] {
     });
   }
 
+  // Layer S — the fractal ladder's standing anchors (see PHILOSOPHY.md). Always prescribed:
+  // every repo serves a business and a philosophy; deeper Layer S adoption is the agent's
+  // and user's call at the Phase-2 gate (METRICS.md — Layer S).
+  metrics.push(
+    {
+      id: 'business.revenue.monthlyUsd',
+      layer: 'S',
+      unit: 'usd/month',
+      description: 'revenue of the business the repo serves',
+      source: 'business analytics / user interview',
+      instrumentMissing: true,
+    },
+    {
+      id: 'philosophy.inclusion.score',
+      layer: 'S',
+      unit: 'ratio',
+      description: 'how fully the product serves all humans; a11y.violations is the code proxy',
+      source: 'manual audit / a11y records',
+      threshold: { kind: 'min', value: 0.95 },
+      instrumentMissing: true,
+    }
+  );
+
   return metrics;
 }

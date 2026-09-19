@@ -14,8 +14,8 @@
     },
     "target": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
-      "description": "The repo/harness being measured."
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+      "description": "The repo/harness being measured. Hierarchical ids allowed: parent/child (no .. segments) — the store nests runs/ accordingly."
     },
     "tool": {
       "type": "string",

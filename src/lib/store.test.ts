@@ -29,11 +29,16 @@ function record(overrides: Partial<RunRecord> = {}): RunRecord {
   };
 }
 
-test('assertValidTarget rejects path traversal and bad ids', () => {
+test('assertValidTarget rejects path traversal and bad ids, accepts hierarchy', () => {
   assert.throws(() => assertValidTarget('../evil'));
-  assert.throws(() => assertValidTarget('a/b'));
+  assert.throws(() => assertValidTarget('a/../b'));
+  assert.throws(() => assertValidTarget('a//b'));
+  assert.throws(() => assertValidTarget('x/'));
+  assert.throws(() => assertValidTarget('/x'));
   assert.throws(() => assertValidTarget('.'));
   assert.doesNotThrow(() => assertValidTarget('my-app.v1'));
+  assert.doesNotThrow(() => assertValidTarget('parent/child'));
+  assert.doesNotThrow(() => assertValidTarget('opencode/packages-tui'));
 });
 
 test('appendRunRecord appends without truncating existing history', () => {
@@ -75,4 +80,26 @@ test('savePlan / loadPlan round-trip under plans/', () => {
   assert.ok(file.endsWith('plan-target.plan.json'));
   assert.equal(loadPlan('plan-target')?.status, 'confirmed');
   assert.equal(loadPlan('never-planned'), null);
+});
+
+test('hierarchical targets nest under runs/ and plans/', () => {
+  const first = appendRunRecord(record({ target: 'parent/child' }));
+  assert.ok(first.file.endsWith(`runs${path.sep}parent${path.sep}child.jsonl`));
+  const second = appendRunRecord(record({ target: 'parent/child', metrics: { 'workflow.rework.loops': 3 } }));
+  assert.equal(second.recordNumber, 2);
+
+  const records = loadRunRecords('parent/child');
+  assert.equal(records.length, 2);
+  assert.ok(listTargets().includes('parent/child'));
+
+  const plan = {
+    schemaVersion: SCHEMA_VERSION,
+    target: 'parent/child',
+    createdAt: new Date().toISOString(),
+    status: 'draft' as const,
+    tooling: [],
+    metrics: [],
+  };
+  assert.ok(savePlan(plan).includes(`plans${path.sep}parent${path.sep}child.plan.json`));
+  assert.equal(loadPlan('parent/child')?.target, 'parent/child');
 });

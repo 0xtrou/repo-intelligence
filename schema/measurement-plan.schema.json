@@ -13,7 +13,8 @@
     },
     "target": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+      "description": "Hierarchical ids allowed: parent/child (no .. segments)."
     },
     "createdAt": {
       "type": "string",
@@ -23,6 +24,11 @@
       "type": "string",
       "enum": ["draft", "confirmed"],
       "description": "draft = machine-generated proposal; confirmed = user signed off (npm run plan -- --confirm)."
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["exploration", "growth", "profit", "repair"],
+      "description": "Plan-level judgment proposed by the agent from matrix signals and signed by the user (--phase). Re-weights priorities; never stored in records."
     },
     "basedOnProfile": {
       "type": "string",
@@ -65,8 +71,8 @@
           },
           "layer": {
             "type": "string",
-            "enum": ["B", "C", "E"],
-            "description": "B=workflow, C=runtime/site, E=outward (external.*/perception.* per METRICS.md)."
+            "enum": ["B", "C", "E", "S"],
+            "description": "B=workflow, C=runtime/site, E=outward (external.*/perception.*), S=scale (business.*/philosophy.*) per METRICS.md."
           },
           "unit": { "type": "string", "minLength": 1 },
           "description": { "type": "string", "minLength": 1 },

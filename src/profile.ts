@@ -50,6 +50,9 @@ function main(): void {
       console.log(`  Outward:        bin=[${d.bin.join(', ')}] private=${d.private ?? '—'} workspaces=[${d.workspaces.join(', ')}] contracts=[${outward.contractFiles.join(', ')}]`);
       console.log(`  Git remote:     ${outward.gitRemote ?? '—'}`);
     }
+    const children = profile.childTargets ?? [];
+    console.log(`  Child targets:  ${children.length === 0 ? '—' : children.map((c) => `${c.name} (${c.manifest})`).join(', ')}`);
+    console.log(`  Recursion:      suggestions only — profile a child deliberately (agent decides depth)`);
     if (outFile !== undefined) console.log(`\nJSON written → ${outFile}`);
   }
 }

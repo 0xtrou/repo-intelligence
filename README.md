@@ -59,7 +59,16 @@ npm run measure -- my-target /tmp/record.json --tool lighthouse --wisdom glm --f
 
 # 4. Derive insight (stats vs baseline, threshold checks, per-wisdom comparison)
 npm run insight -- my-target
+
+# Fractal ladder: recurse deliberately (child targets nest), roll up the bigger matrix
+npm run insight -- my-target --rollup
+npm run plan -- /tmp/profile.json --confirm --phase growth
 ```
+
+The **Inside–Outside model** and the **fractal ladder** (repo → business model → humanity) are in
+[PHILOSOPHY.md](PHILOSOPHY.md): the toolkit suggests depth, the agent decides it, the user signs
+direction changes. Every intelligence round ends in a signed rebalance — coverage gaps, phase
+diagnosis, rebalanced priorities.
 
 ## Layout
 

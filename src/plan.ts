@@ -12,13 +12,15 @@ import * as fs from 'node:fs';
 import { fail, parseArgs } from './lib/cli';
 import { savePlan } from './lib/store';
 import { buildMetrics, buildTooling } from './lib/planLib';
-import { MeasurementPlan, RepoProfile, SCHEMA_VERSION } from './lib/types';
+import { MeasurementPlan, PlanPhase, RepoProfile, SCHEMA_VERSION } from './lib/types';
+
+const PHASES: PlanPhase[] = ['exploration', 'growth', 'profit', 'repair'];
 
 function main(): void {
   const { flags, positionals } = parseArgs(process.argv.slice(2));
   const profileFile = positionals[0];
   if (profileFile === undefined) {
-    fail('missing profile file', 'usage: npm run plan -- <profile.json> [--out <file>] [--confirm]');
+    fail('missing profile file', 'usage: npm run plan -- <profile.json> [--out <file>] [--confirm] [--phase <exploration|growth|profit|repair>]');
   }
 
   let profile: RepoProfile;
@@ -31,6 +33,16 @@ function main(): void {
     fail(`not a RepoProfile: ${profileFile} — run npm run profile first`);
   }
 
+  // phase is a plan-level judgment: the agent proposes it, the user signs it (see METRICS.md — Phases)
+  let phase: PlanPhase | undefined;
+  const phaseFlag = typeof flags['phase'] === 'string' ? flags['phase'] : undefined;
+  if (phaseFlag !== undefined) {
+    if (!PHASES.includes(phaseFlag as PlanPhase)) {
+      fail(`invalid phase "${phaseFlag}" — one of: ${PHASES.join(', ')}`);
+    }
+    phase = phaseFlag as PlanPhase;
+  }
+
   const plan: MeasurementPlan = {
     schemaVersion: SCHEMA_VERSION,
     target: profile.target,
@@ -40,10 +52,11 @@ function main(): void {
     tooling: buildTooling(profile),
     metrics: buildMetrics(profile),
   };
+  if (phase !== undefined) plan.phase = phase;
 
   const outFile = savePlan(plan, typeof flags['out'] === 'string' ? flags['out'] : undefined);
 
-  console.log(`MeasurementPlan (${plan.status}) — ${plan.target} → ${outFile}`);
+  console.log(`MeasurementPlan (${plan.status}${plan.phase ? `, phase: ${plan.phase}` : ''}) — ${plan.target} → ${outFile}`);
   console.log('\nTooling prescriptions:');
   for (const t of plan.tooling) {
     console.log(`  [${t.present ? 'present ' : 'PRESCRIBE'}] ${t.concern.padEnd(20)} ${t.tool}`);

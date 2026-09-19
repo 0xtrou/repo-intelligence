@@ -33,6 +33,9 @@ function makeFixture(): string {
   write('src/lib/x.test.ts', 'test("x", () => {});\n');
   write('node_modules/dep/index.ts', 'const big = "' + 'x'.repeat(120) + '";\n');
   write('.maestro/flows/home.yaml', 'flow: home\n');
+  // fractal ladder: child-target suggestions (own manifests)
+  write('packages/child/package.json', '{"name": "child"}\n');
+  write('packages/child/inner/Cargo.toml', '[package]\nname = "inner"\n');
   return root;
 }
 
@@ -73,6 +76,11 @@ test('buildProfile inventories a fixture repo', () => {
   assert.equal(profile.outward?.declares.publishConfig, true);
   assert.deepEqual(profile.outward?.contractFiles, ['openapi.json']);
   assert.equal(profile.outward?.gitRemote, null); // tmp fixture is not a git repo
+
+  // fractal ladder: child suggestions discovered, never auto-descended
+  const childNames = (profile.childTargets ?? []).map((c) => c.name);
+  assert.ok(childNames.includes('packages/child'));
+  assert.ok(childNames.includes('packages/child/inner'));
 });
 
 test('buildProfile throws on a non-directory path', () => {
